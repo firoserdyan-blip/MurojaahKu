@@ -21,7 +21,7 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
   
   /* PENTING: Mengatasi masalah konten keluar garis di HP */
-  overflow: hidden; /* Pastikan semua konten di dalam tidak keluar dari border ini */
+  overflow: hidden; 
 }
 
 /* Styling untuk judul utama */
@@ -55,16 +55,16 @@ h1 {
 
 .calendar-day {
   background-color: #f0f0f0;
-  padding: 10px 5px; /* Kurangi padding vertikal/horizontal agar lebih ringkas */
+  padding: 10px 5px; 
   text-align: center;
   border-radius: 5px;
   cursor: pointer;
   position: relative;
-  min-height: 40px; /* Kurangi tinggi minimum */
-  display: flex; /* Tambahkan ini agar konten (angka dan centang) di tengah */
+  min-height: 40px; 
+  display: flex; 
   justify-content: center;
   align-items: center;
-  font-size: 0.9em; /* Kecilkan sedikit ukuran font */
+  font-size: 0.9em; 
   transition: background-color 0.2s;
 }
 
@@ -83,10 +83,9 @@ h1 {
 }
 
 .indicator {
-    /* Posisikan indikator di dalam kotak (atau hapus jika angkanya sudah di tengah) */
     position: absolute; 
-    top: 2px; /* Geser ke atas */
-    right: 2px; /* Geser ke kanan */
+    top: 2px; 
+    right: 2px; 
     color: green;
     font-size: 0.9em;
 }
@@ -137,7 +136,7 @@ h1 {
 /* --- Grid Juz dan Surah --- */
 .juz-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Kurangi menjadi 2 kolom di HP */
+    grid-template-columns: repeat(2, 1fr); 
     gap: 10px;
     margin-top: 15px;
 }
@@ -185,7 +184,7 @@ h1 {
     margin: 0;
 }
 
-/* --- Catatan dan Tombol (TERMASUK TOMBOL HAPUS) --- */
+/* --- Catatan dan Tombol (Footer Modal) --- */
 
 .catatan-section textarea {
     width: 100%;
@@ -207,7 +206,6 @@ h1 {
 }
 
 .review-controls-footer {
-    /* Wadah untuk tombol Back dan Save agar tetap berdekatan di sisi kanan */
     display: flex;
     gap: 10px;
 }
@@ -241,7 +239,7 @@ h1 {
 }
 
 .delete-button {
-    background-color: #dc3545; /* Merah untuk hapus */
+    background-color: #dc3545; 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -259,4 +257,4 @@ h1 {
     padding: 15px;
     border: 1px dashed #007bff;
     border-radius: 5px;
-    }
+}
