@@ -151,7 +151,7 @@
         }
         
         .delete-all-button {
-            background-color: #dc3545; /* Merah untuk hapus semua */
+            background-color: #dc3545; 
             color: white;
             border: none;
             padding: 10px 20px;
@@ -197,7 +197,7 @@
             background: white;
             padding: 20px;
             border-radius: 8px;
-            max-height: 90vh;
+            max-height: 90vh; /* Memastikan modal bisa di-scroll pada layar kecil */
             overflow-y: auto;
         }
 
@@ -222,12 +222,40 @@
             cursor: pointer;
         }
         
-        /* Tambahan styling untuk tombol dan form di dalam modal (tidak berubah) */
-        .juz-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
+        /* REVISI CSS: Untuk Scroll Juz dan Surah */
+        .juz-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+            margin-top: 15px;
+            max-height: 300px; /* Batasi tinggi grid Juz */
+            overflow-y: auto; /* Aktifkan scroll pada grid Juz */
+            padding-right: 10px; /* Beri ruang untuk scrollbar */
+        }
+        
+        .surah-list { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            max-height: 400px; /* Batasi tinggi list Surah */
+            overflow-y: auto; /* Aktifkan scroll pada list Surah */
+            padding-right: 10px; /* Beri ruang untuk scrollbar */
+        }
+        
+        /* REVISI CSS: Teks Surah Display */
+        .surah-text-display { 
+            background-color: #f9f9f9; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            margin-bottom: 15px; 
+            max-height: 250px; /* Batasi tinggi tampilan teks */
+            overflow-y: auto; /* Aktifkan scroll untuk teks Surah */
+        }
+        
+        /* (Styling tombol, form, dan progress view lainnya tidak berubah) */
         .juz-item, .surah-item { padding: 15px; border: 1px solid #007bff; background-color: #e9f5ff; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.2s; text-align: center; }
         .juz-item:hover, .surah-item:hover { background-color: #cce5ff; }
-        .surah-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; }
-        .surah-text-display { background-color: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; }
         .surah-text-display pre { white-space: pre-wrap; font-size: 1.1em; font-family: 'Times New Roman', serif; text-align: right; line-height: 2.2; margin: 0; }
         .catatan-section textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         .modal-footer { display: flex; justify-content: flex-end; align-items: center; padding-top: 15px; margin-top: 10px; border-top: 1px solid #eee; }
@@ -245,7 +273,6 @@
         <h1>📚 Muroja'ah Tracker Lokal</h1>
         
         <div id="calendar-nav-root"></div>
-        
         <div id="calendar-root"></div>
         
         <div class="app-controls">
@@ -288,38 +315,67 @@
         let modalSelection = { juz: null, surah: null, catatan: '' };
         let isLoading = false;
         
-        // State untuk Kalender Navigasi (Default: Bulan Saat Ini)
         let currentYear = new Date().getFullYear();
         let currentMonth = new Date().getMonth(); 
 
-        // --- B. API Mock (Data Dummy) ---
+        // --- B. API Mock (Data Dummy Ditingkatkan) ---
+        
+        // Data Juz (30 Juz)
+        const juzData = Array.from({ length: 30 }, (_, i) => {
+            const juzId = i + 1;
+            return {
+                id: juzId,
+                name: `Juz ${juzId}: ${juzId === 1 ? 'Alif Lam Mim' : juzId === 2 ? 'Sayaqul' : `Kelompok ${juzId}`}`
+            };
+        });
+
+        // Data Surah (Simulasi 5 Surah per Juz untuk menunjukkan scroll)
         const surahData = [
-            { id: 1, juz: 1, name_id: "Al-Fatihah", verses: 7, start_ayah: 1, end_ayah: 7 },
-            { id: 2, juz: 1, name_id: "Al-Baqarah", verses: 286, start_ayah: 1, end_ayah: 286 },
-            { id: 3, juz: 3, name_id: "Ali 'Imran", verses: 200, start_ayah: 1, end_ayah: 200 },
+            { id: 1, juz: 1, name_id: "Al-Fatihah", verses: 7 },
+            { id: 2, juz: 1, name_id: "Al-Baqarah", verses: 286 },
+            { id: 3, juz: 1, name_id: "Ali 'Imran", verses: 200 },
+            { id: 4, juz: 1, name_id: "An-Nisa", verses: 176 },
+            { id: 5, juz: 1, name_id: "Al-Ma'idah", verses: 120 },
         ];
-
-        const juzData = [
-            { id: 1, surah_start_id: 1, surah_end_id: 2, name: "Juz 1: Alif Lam Mim" },
-            { id: 2, surah_start_id: 2, surah_end_id: 2, name: "Juz 2: Sayaqul" },
-            { id: 3, surah_start_id: 2, surah_end_id: 3, name: "Juz 3: Tilka-r-Rusul" },
-        ];
-
+        // Tambahkan dummy surah untuk juz lain agar Juz 2 dan 3 dst. tidak kosong
+        for(let j = 2; j <= 30; j++) {
+             for(let k = 1; k <= 5; k++) {
+                surahData.push({
+                    id: surahData.length + 1, 
+                    juz: j, 
+                    name_id: `Surah Juz ${j} - ${k}`, 
+                    verses: 50 + k 
+                });
+             }
+        }
+        
         const fetchJuzList = () => Promise.resolve(juzData);
+
         const fetchSurahsByJuz = (juzId) => {
             const filteredSurahs = surahData.filter(surah => surah.juz === juzId);
             return Promise.resolve(filteredSurahs);
         };
+
         const fetchSurahText = (surahId) => {
             const surah = surahData.find(s => s.id === surahId);
-            const dummyText = `
+            const numVerses = surah ? surah.verses : 10;
+            
+            // Teks Dummy yang Panjang agar Scroll Aktif
+            let longText = `
                 بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ.
-                {Teks Ayat 1...}
-                {Teks Ayat 2...}
-                {Teks Ayat 3...}
-                ... ${surah ? surah.name_id : 'Surah'} Ayat ${surah ? surah.verses : ''}.
+                
+                {Teks Ayat 1: Ini adalah teks yang panjang agar tampilan scroll aktif.}
+                {Teks Ayat 2: Baris kedua untuk mengisi ruang dan memastikan konten melimpah.}
+                {Teks Ayat 3: Baris ketiga. ${surah ? surah.name_id : ''} dimulai.}
             `;
-            return Promise.resolve(dummyText);
+            
+            for (let i = 4; i <= numVerses; i++) {
+                longText += `\n{Teks Ayat ${i}: Isi dummy untuk ${surah ? surah.name_id : 'Surah'} Ayat ${i}.}`;
+            }
+            
+            longText += `\n\n... Selesai: ${surah ? surah.name_id : 'Surah'} memiliki ${numVerses} Ayat.`;
+            
+            return Promise.resolve(longText);
         };
 
         // --- C. Fungsi Render Kalender dan Navigasi ---
@@ -351,14 +407,13 @@
             const root = document.getElementById('calendar-root');
             root.innerHTML = '';
             
-            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0=Minggu, 1=Senin, dst.
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const today = new Date().toISOString().slice(0, 10);
             
             const calendarGrid = document.createElement('div');
             calendarGrid.className = 'calendar-grid';
 
-            // Tambahkan Label Hari (Minggu sampai Sabtu)
             DAYS_OF_WEEK.forEach(day => {
                 const label = document.createElement('div');
                 label.className = 'day-label';
@@ -366,14 +421,12 @@
                 calendarGrid.appendChild(label);
             });
 
-            // Isi kotak kosong (padding) sebelum tanggal 1
             for (let i = 0; i < firstDayOfMonth; i++) {
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = 'calendar-day disabled';
                 calendarGrid.appendChild(emptyDiv);
             }
 
-            // Isi Tanggal
             for (let i = 1; i <= daysInMonth; i++) {
                 const dateISO = new Date(currentYear, currentMonth, i).toISOString().slice(0, 10);
                 
@@ -410,22 +463,23 @@
                 return;
             }
 
-            // (Kode Modal sama seperti sebelumnya, hanya menampilkan langkah-langkah input data)
             let contentHTML = '';
             let currentData = progressData[selectedDate] || [];
-            
+
             if (isLoading) { contentHTML = `<p>Memuat data Al-Qur'an...</p>`; } 
             else if (modalStep === 'JUZ') {
                 let juzListHTML = '';
                 const list = await fetchJuzList();
                 list.forEach(juz => { juzListHTML += `<button class="juz-item" data-juz-id="${juz.id}" data-juz-name="${juz.name}">${juz.name}</button>`; });
-                contentHTML = `<h3>Pilih Juz untuk Muroja'ah</h3><div class="juz-grid">${juzListHTML}</div>`;
+                // KONTEN JUZ SEKARANG BISA DI-SCROLL BERKAT CSS: .juz-grid { overflow-y: auto; max-height: 300px; }
+                contentHTML = `<h3>Pilih Juz untuk Muroja'ah (Scroll untuk melihat 30 Juz)</h3><div class="juz-grid">${juzListHTML}</div>`;
             } 
             else if (modalStep === 'SURAH') {
                 let surahListHTML = '';
                 const list = await fetchSurahsByJuz(modalSelection.juz.id);
                 list.forEach(surah => { surahListHTML += `<button class="surah-item" data-surah-id="${surah.id}" data-surah-name="${surah.name_id}">${surah.name_id} (${surah.verses} Ayat)</button>`; });
-                contentHTML = `<h3>Pilih Surah di ${modalSelection.juz.name}</h3><button class="back-button" onclick="setStep('JUZ')">Pilih Juz Lain</button><div class="surah-list">${surahListHTML}</div>`;
+                // KONTEN SURAH SEKARANG BISA DI-SCROLL BERKAT CSS: .surah-list { overflow-y: auto; max-height: 400px; }
+                contentHTML = `<h3>Pilih Surah di ${modalSelection.juz.name} (Scroll jika banyak)</h3><button class="back-button" onclick="setStep('JUZ')">Pilih Juz Lain</button><div class="surah-list">${surahListHTML}</div>`;
             } 
             else if (modalStep === 'REVIEW') {
                 const surahText = await fetchSurahText(modalSelection.surah.id);
@@ -446,7 +500,6 @@
                 existingProgressHTML = `<div class="existing-progress-view"><h4>Progress di ${selectedDate} sebelumnya:</h4>${items}</div>`;
             }
 
-            // Tombol Hapus per tanggal DITEMUKAN di sini (di modal-footer)
             const deleteButtonPerDateHTML = currentData.length > 0 && modalStep !== 'REVIEW' ? 
                 `<button class="delete-button" onclick="deleteProgress()">Hapus Data di Tanggal Ini</button>` : '';
 
@@ -458,7 +511,15 @@
                 </div>`;
             }
             
-            const footerHTML = `<div class="modal-footer">${deleteButtonPerDateHTML} ${footerContentHTML}</div>`;
+            // Perbaikan: Tombol Hapus per tanggal hanya di tampilkan jika bukan di step REVIEW
+            const footerHTML = `
+                <div class="modal-footer">
+                    ${modalStep !== 'REVIEW' ? deleteButtonPerDateHTML : ''}
+                    <div class="review-controls-footer">
+                       ${footerContentHTML}
+                    </div>
+                </div>
+            `;
             
             const modalHTML = `
                 <div class="modal-overlay">
@@ -482,7 +543,6 @@
                 root.innerHTML = '';
                 return;
             }
-            // (Isi Progress View tetap sama)
         }
         
         function renderApp() {
@@ -541,13 +601,12 @@
         }
         
         function closePolicy(event) {
-            // Tutup hanya jika klik tombol close atau overlay, bukan klik di dalam konten modal
             if (!event || event.target.classList.contains('modal-overlay') || event.target.classList.contains('close-button')) {
                 document.getElementById('modal-root').innerHTML = '';
             }
         }
 
-        // --- F. Event Handlers dan State Updater (sama seperti sebelumnya) ---
+        // --- F. Event Handlers dan State Updater ---
 
         function handleDateClick(date) {
             selectedDate = date;
@@ -594,18 +653,22 @@
             if (!modalContent) return;
 
             modalContent.addEventListener('click', async (e) => {
-                // ... (Logic klik Juz/Surah/Save tetap sama) ...
+                // Handle Juz Select
                 if (e.target.classList.contains('juz-item')) {
                     isLoading = true; renderModal();
                     const juz = { id: parseInt(e.target.dataset.juzId), name: e.target.dataset.juzName };
                     modalSelection.juz = juz; modalStep = 'SURAH';
                     await fetchSurahsByJuz(juz.id); isLoading = false; renderModal();
-                } else if (e.target.classList.contains('surah-item')) {
+                } 
+                // Handle Surah Select
+                else if (e.target.classList.contains('surah-item')) {
                     isLoading = true; renderModal();
                     const surah = { id: parseInt(e.target.dataset.surahId), name_id: e.target.dataset.surahName };
                     modalSelection.surah = surah; modalStep = 'REVIEW';
                     await fetchSurahText(surah.id); isLoading = false; renderModal();
-                } else if (e.target.id === 'save-progress-btn') {
+                } 
+                // Handle Save Button
+                else if (e.target.id === 'save-progress-btn') {
                     saveProgress();
                 }
             });
