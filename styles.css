@@ -1,10 +1,42 @@
-/* src/styles.css */
+/* -------------------------------------------------------------------- */
+/* styles.css - Kode CSS LENGKAP untuk Muroja'ah Tracker (Vanilla JS) */
+/* -------------------------------------------------------------------- */
+
+body {
+    background-color: #f4f4f4; /* Latar belakang body agar border terlihat jelas */
+    margin: 0;
+    padding: 0;
+}
 
 .app-container {
   padding: 20px;
   max-width: 800px;
-  margin: 0 auto;
+  margin: 30px auto; 
   font-family: sans-serif;
+  
+  /* --- Styling Permintaan Anda --- */
+  border: 4px solid #4CAF50; /* Border hijau tebal di sekeliling website */
+  border-radius: 12px;       
+  background-color: white;   /* Latar belakang konten di dalam border (putih) */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+/* Styling untuk judul utama yang Anda minta */
+.main-header {
+    text-align: center;
+    color: #4CAF50; /* Warna hijau */
+    font-size: 2.5em;
+    margin-top: 0; /* Hilangkan margin atas bawaan */
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+/* Judul "Tracker Lokal" */
+h1 {
+    color: #333;
+    font-size: 1.5em;
+    margin-top: 0;
 }
 
 /* --- Kalender --- */
@@ -15,6 +47,7 @@
   margin-top: 20px;
   border: 1px solid #ccc;
   padding: 10px;
+  background-color: #ffffff; /* Memastikan background putih */
 }
 
 .calendar-day {
@@ -25,6 +58,7 @@
   cursor: pointer;
   position: relative;
   min-height: 50px;
+  transition: background-color 0.2s;
 }
 
 .calendar-day:hover {
@@ -37,7 +71,7 @@
 }
 
 .calendar-day.has-data {
-    background-color: #d4edda;
+    background-color: #d4edda; /* Hijau muda saat ada data */
     border: 1px solid #c3e6cb;
 }
 
@@ -49,7 +83,7 @@
     font-size: 1.2em;
 }
 
-/* --- Modal --- */
+/* --- Modal (Pop-up) --- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -103,11 +137,12 @@
 .juz-item, .surah-item {
     padding: 15px;
     border: 1px solid #007bff;
-    background-color: #e9f5ff;
+    background-color: #e9f5ff; /* Biru muda */
     border-radius: 5px;
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.2s;
+    text-align: center;
 }
 
 .juz-item:hover, .surah-item:hover {
@@ -122,7 +157,7 @@
     overflow-y: auto;
 }
 
-/* --- Teks Surah --- */
+/* --- Teks Surah Display --- */
 .surah-text-display {
     background-color: #f9f9f9;
     padding: 15px;
@@ -139,15 +174,17 @@
     font-family: 'Times New Roman', serif;
     text-align: right;
     line-height: 2.2;
+    margin: 0;
 }
 
-/* --- Catatan --- */
+/* --- Catatan dan Tombol --- */
 .catatan-section textarea {
     width: 100%;
     padding: 10px;
     margin-top: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box; /* Agar padding tidak melebarkan elemen */
 }
 
 .save-button {
@@ -159,6 +196,11 @@
     cursor: pointer;
     margin-top: 10px;
     float: right;
+    transition: background-color 0.2s;
+}
+
+.save-button:hover {
+    background-color: #218838;
 }
 
 .back-button {
@@ -169,6 +211,11 @@
     border-radius: 5px;
     cursor: pointer;
     margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #5a6268;
 }
 
 .existing-progress-view {
