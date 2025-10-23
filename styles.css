@@ -1,8 +1,205 @@
-/* --- styles.css: Tambahan di bagian paling bawah --- */
+/* -------------------------------------------------------------------- */
+/* styles.css - Kode CSS LENGKAP & REVISI TAMPILAN */
+/* -------------------------------------------------------------------- */
 
+body {
+    background-color: #f4f4f4; 
+    margin: 0;
+    padding: 0;
+}
+
+.app-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 30px auto; 
+  font-family: sans-serif;
+  
+  /* Styling Border Hijau */
+  border: 4px solid #4CAF50; 
+  border-radius: 12px;       
+  background-color: white;   
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  
+  /* PENTING: Mengatasi masalah konten keluar garis di HP */
+  overflow: hidden; /* Pastikan semua konten di dalam tidak keluar dari border ini */
+}
+
+/* Styling untuk judul utama */
+.main-header {
+    text-align: center;
+    color: #4CAF50; 
+    font-size: 2.5em;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+h1 {
+    color: #333;
+    font-size: 1.5em;
+    margin-top: 0;
+}
+
+/* --- Kalender (Solusi Perataan) --- */
+.calendar-grid {
+  /* PENTING: Gunakan 1fr agar lebar kolom menyesuaikan secara otomatis */
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); 
+  gap: 5px; /* Kurangi gap agar lebih rapat dan muat */
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background-color: #ffffff; 
+}
+
+.calendar-day {
+  background-color: #f0f0f0;
+  padding: 10px 5px; /* Kurangi padding vertikal/horizontal agar lebih ringkas */
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;
+  min-height: 40px; /* Kurangi tinggi minimum */
+  display: flex; /* Tambahkan ini agar konten (angka dan centang) di tengah */
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9em; /* Kecilkan sedikit ukuran font */
+  transition: background-color 0.2s;
+}
+
+.calendar-day:hover {
+  background-color: #e0e0e0;
+}
+
+.calendar-day.today {
+    border: 2px solid #007bff;
+    font-weight: bold;
+}
+
+.calendar-day.has-data {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.indicator {
+    /* Posisikan indikator di dalam kotak (atau hapus jika angkanya sudah di tengah) */
+    position: absolute; 
+    top: 2px; /* Geser ke atas */
+    right: 2px; /* Geser ke kanan */
+    color: green;
+    font-size: 0.9em;
+}
+
+/* --- Modal (Pop-up) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.large-modal {
+    width: 90%;
+    max-width: 800px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+/* --- Grid Juz dan Surah --- */
+.juz-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Kurangi menjadi 2 kolom di HP */
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.juz-item, .surah-item {
+    padding: 15px;
+    border: 1px solid #007bff;
+    background-color: #e9f5ff; 
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s;
+    text-align: center;
+}
+
+.juz-item:hover, .surah-item:hover {
+    background-color: #cce5ff;
+}
+
+.surah-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* --- Teks Surah Display --- */
+.surah-text-display {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.surah-text-display pre {
+    white-space: pre-wrap;
+    font-size: 1.1em;
+    font-family: 'Times New Roman', serif;
+    text-align: right;
+    line-height: 2.2;
+    margin: 0;
+}
+
+/* --- Catatan dan Tombol (TERMASUK TOMBOL HAPUS) --- */
+
+.catatan-section textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Wadah tombol di footer modal (memperbaiki penempatan tombol hapus) */
 .modal-footer {
     display: flex;
-    justify-content: space-between; /* Membuat tombol hapus (kiri) dan simpan (kanan) terpisah */
+    justify-content: space-between; 
     align-items: center;
     padding-top: 15px;
     margin-top: 10px; 
@@ -13,6 +210,34 @@
     /* Wadah untuk tombol Back dan Save agar tetap berdekatan di sisi kanan */
     display: flex;
     gap: 10px;
+}
+
+.save-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.save-button:hover {
+    background-color: #218838;
+}
+
+.back-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #5a6268;
 }
 
 .delete-button {
@@ -28,3 +253,10 @@
 .delete-button:hover {
     background-color: #c82333;
 }
+
+.existing-progress-view {
+    margin-top: 30px;
+    padding: 15px;
+    border: 1px dashed #007bff;
+    border-radius: 5px;
+    }
