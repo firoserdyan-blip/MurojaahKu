@@ -1,10 +1,13 @@
 {
-  "name": "MurojaahKu",
+  "name": "MurojaahKu Tracker",
   "short_name": "MurojaahKu",
-  "start_url": "./",
+  "id": "/murojaahku-pwa-2025-v1/", 
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4CAF50",
+  "description": "Pelacak Muroja'ah Al-Qur'an (Online/Offline)",
   "icons": [
     {
       "src": "logo.png",
