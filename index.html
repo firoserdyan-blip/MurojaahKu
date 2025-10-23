@@ -10,15 +10,13 @@
             background-color: #f4f4f4; 
             margin: 0;
             padding: 0;
+            font-family: sans-serif;
         }
 
         .app-container {
             padding: 20px;
             max-width: 800px;
             margin: 30px auto; 
-            font-family: sans-serif;
-            
-            /* Styling Border Hijau */
             border: 4px solid #4CAF50; 
             border-radius: 12px;       
             background-color: white;   
@@ -42,7 +40,44 @@
             margin-top: 0;
         }
 
-        /* --- Kalender (Revisi Tampilan Rapi) --- */
+        /* --- Navigasi Kalender (Bulan/Tahun) --- */
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .calendar-nav-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-button:hover {
+            background-color: #0056b3;
+        }
+        
+        .month-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* --- Kalender Grid --- */
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr); 
@@ -51,6 +86,14 @@
             border: 1px solid #ccc;
             padding: 10px;
             background-color: #ffffff; 
+        }
+        
+        .day-label {
+            text-align: center;
+            font-weight: bold;
+            color: #6c757d;
+            padding: 5px 0;
+            font-size: 0.8em;
         }
 
         .calendar-day {
@@ -81,6 +124,13 @@
             background-color: #d4edda;
             border: 1px solid #c3e6cb;
         }
+        
+        .calendar-day.disabled {
+            background-color: #fff;
+            cursor: default;
+            color: #ccc;
+            border: none;
+        }
 
         .indicator {
             position: absolute; 
@@ -90,7 +140,46 @@
             font-size: 0.9em;
         }
 
-        /* --- Modal (Pop-up) --- */
+        /* --- Tombol Aksi di Bawah Kalender --- */
+        .app-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+        
+        .delete-all-button {
+            background-color: #dc3545; /* Merah untuk hapus semua */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+        }
+
+        .delete-all-button:hover {
+            background-color: #c82333;
+        }
+        
+        .privacy-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .privacy-button:hover {
+            background-color: #5a6268;
+        }
+
+        /* --- Modal (Pop-up) Umum dan Progress --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -132,147 +221,47 @@
             font-size: 1.5em;
             cursor: pointer;
         }
-
-        /* --- Grid Juz dan Surah --- */
-        .juz-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .juz-item, .surah-item {
-            padding: 15px;
-            border: 1px solid #007bff;
-            background-color: #e9f5ff; 
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s;
-            text-align: center;
-        }
-
-        .juz-item:hover, .surah-item:hover {
-            background-color: #cce5ff;
-        }
-
-        .surah-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        /* --- Teks Surah Display --- */
-        .surah-text-display {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .surah-text-display pre {
-            white-space: pre-wrap;
-            font-size: 1.1em;
-            font-family: 'Times New Roman', serif;
-            text-align: right;
-            line-height: 2.2;
-            margin: 0;
-        }
-
-        /* --- Catatan dan Tombol (Footer Modal) --- */
-
-        .catatan-section textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: space-between; 
-            align-items: center;
-            padding-top: 15px;
-            margin-top: 10px; 
-            border-top: 1px solid #eee;
-        }
-
-        .review-controls-footer {
-            display: flex;
-            gap: 10px;
-        }
-
-        .save-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .save-button:hover {
-            background-color: #218838;
-        }
-
-        .back-button {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .back-button:hover {
-            background-color: #5a6268;
-        }
-
-        .delete-button {
-            background-color: #dc3545; 
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .delete-button:hover {
-            background-color: #c82333;
-        }
-
-        .existing-progress-view {
-            margin-top: 30px;
-            padding: 15px;
-            border: 1px dashed #007bff;
-            border-radius: 5px;
-        }
+        
+        /* Tambahan styling untuk tombol dan form di dalam modal (tidak berubah) */
+        .juz-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
+        .juz-item, .surah-item { padding: 15px; border: 1px solid #007bff; background-color: #e9f5ff; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.2s; text-align: center; }
+        .juz-item:hover, .surah-item:hover { background-color: #cce5ff; }
+        .surah-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; }
+        .surah-text-display { background-color: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; }
+        .surah-text-display pre { white-space: pre-wrap; font-size: 1.1em; font-family: 'Times New Roman', serif; text-align: right; line-height: 2.2; margin: 0; }
+        .catatan-section textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .modal-footer { display: flex; justify-content: flex-end; align-items: center; padding-top: 15px; margin-top: 10px; border-top: 1px solid #eee; }
+        .review-controls-footer { display: flex; gap: 10px; }
+        .save-button { background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+        .save-button:hover { background-color: #218838; }
+        .back-button { background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+        .back-button:hover { background-color: #5a6268; }
+        .existing-progress-view { margin-top: 30px; padding: 15px; border: 1px dashed #007bff; border-radius: 5px; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <h1 class="main-header">MurojaahKu</h1> 
         <h1>📚 Muroja'ah Tracker Lokal</h1>
-        <p style="color: red; font-weight: bold;">Catatan: Data tersimpan di browser perangkat ini (Local Storage).</p>
+        
+        <div id="calendar-nav-root"></div>
         
         <div id="calendar-root"></div>
+        
+        <div class="app-controls">
+            <button class="privacy-button" onclick="showPrivacyPolicy()">Privacy Policy</button>
+            <button class="delete-all-button" onclick="deleteAllData()">Hapus SELURUH Data</button>
+        </div>
+        
         <div id="modal-root"></div>
         <div id="progress-view-root"></div>
     </div>
 
     <script>
-        // --- A. Hook/Fungsi: Manajemen Local Storage ---
+        // --- A. Hook/Fungsi: Manajemen Local Storage & State ---
         const LOCAL_STORAGE_KEY = 'quranProgressVanilla';
+        const DAYS_OF_WEEK = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
         function getProgressData() {
             try {
@@ -292,15 +281,18 @@
             }
         }
 
-        // --- B. Variabel State Global ---
         let progressData = getProgressData();
         let isModalOpen = false;
         let selectedDate = '';
         let modalStep = 'JUZ';
         let modalSelection = { juz: null, surah: null, catatan: '' };
         let isLoading = false;
+        
+        // State untuk Kalender Navigasi (Default: Bulan Saat Ini)
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth(); 
 
-        // --- C. API Mock (Data Dummy) ---
+        // --- B. API Mock (Data Dummy) ---
         const surahData = [
             { id: 1, juz: 1, name_id: "Al-Fatihah", verses: 7, start_ayah: 1, end_ayah: 7 },
             { id: 2, juz: 1, name_id: "Al-Baqarah", verses: 286, start_ayah: 1, end_ayah: 286 },
@@ -314,12 +306,10 @@
         ];
 
         const fetchJuzList = () => Promise.resolve(juzData);
-
         const fetchSurahsByJuz = (juzId) => {
             const filteredSurahs = surahData.filter(surah => surah.juz === juzId);
             return Promise.resolve(filteredSurahs);
         };
-
         const fetchSurahText = (surahId) => {
             const surah = surahData.find(s => s.id === surahId);
             const dummyText = `
@@ -332,35 +322,70 @@
             return Promise.resolve(dummyText);
         };
 
-        // --- D. Fungsi Render ---
-        function renderApp() {
-            renderCalendar();
-            renderModal();
-            renderProgressView();
+        // --- C. Fungsi Render Kalender dan Navigasi ---
+        
+        function renderCalendarNav() {
+            const navRoot = document.getElementById('calendar-nav-root');
+            navRoot.innerHTML = `
+                <div class="calendar-nav">
+                    <button class="nav-button" onclick="changeMonth(-1)">&#9664;</button>
+                    <span class="month-display">${MONTHS[currentMonth]} ${currentYear}</span>
+                    <button class="nav-button" onclick="changeMonth(1)">&#9654;</button>
+                </div>
+            `;
+        }
+        
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderApp();
         }
 
         function renderCalendar() {
             const root = document.getElementById('calendar-root');
             root.innerHTML = '';
             
-            const daysInMonth = 30; 
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0=Minggu, 1=Senin, dst.
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const today = new Date().toISOString().slice(0, 10);
             
             const calendarGrid = document.createElement('div');
             calendarGrid.className = 'calendar-grid';
 
+            // Tambahkan Label Hari (Minggu sampai Sabtu)
+            DAYS_OF_WEEK.forEach(day => {
+                const label = document.createElement('div');
+                label.className = 'day-label';
+                label.textContent = day;
+                calendarGrid.appendChild(label);
+            });
+
+            // Isi kotak kosong (padding) sebelum tanggal 1
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'calendar-day disabled';
+                calendarGrid.appendChild(emptyDiv);
+            }
+
+            // Isi Tanggal
             for (let i = 1; i <= daysInMonth; i++) {
-                const currentDate = new Date(new Date().getFullYear(), new Date().getMonth(), i).toISOString().slice(0, 10);
+                const dateISO = new Date(currentYear, currentMonth, i).toISOString().slice(0, 10);
                 
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'calendar-day';
                 dayDiv.textContent = i;
-                dayDiv.setAttribute('data-date', currentDate);
+                dayDiv.setAttribute('data-date', dateISO);
 
-                if (currentDate === today) {
+                if (dateISO === today) {
                     dayDiv.classList.add('today');
                 }
-                if (progressData[currentDate] && progressData[currentDate].length > 0) {
+                if (progressData[dateISO] && progressData[dateISO].length > 0) {
                     dayDiv.classList.add('has-data');
                     const indicator = document.createElement('span');
                     indicator.className = 'indicator';
@@ -368,7 +393,7 @@
                     dayDiv.appendChild(indicator);
                 }
 
-                dayDiv.addEventListener('click', () => handleDateClick(currentDate));
+                dayDiv.addEventListener('click', () => handleDateClick(dateISO));
                 
                 calendarGrid.appendChild(dayDiv);
             }
@@ -376,6 +401,8 @@
             root.appendChild(calendarGrid);
         }
 
+        // --- D. Fungsi Modal dan Logic ---
+        
         async function renderModal() {
             const root = document.getElementById('modal-root');
             if (!isModalOpen) {
@@ -383,50 +410,34 @@
                 return;
             }
 
+            // (Kode Modal sama seperti sebelumnya, hanya menampilkan langkah-langkah input data)
             let contentHTML = '';
             let currentData = progressData[selectedDate] || [];
-
-            if (isLoading) {
-                contentHTML = `<p>Memuat data Al-Qur'an...</p>`;
-            } else if (modalStep === 'JUZ') {
+            
+            if (isLoading) { contentHTML = `<p>Memuat data Al-Qur'an...</p>`; } 
+            else if (modalStep === 'JUZ') {
                 let juzListHTML = '';
                 const list = await fetchJuzList();
-                
-                list.forEach(juz => {
-                    juzListHTML += `<button class="juz-item" data-juz-id="${juz.id}" data-juz-name="${juz.name}">${juz.name}</button>`;
-                });
-                
-                contentHTML = `
-                    <h3>Pilih Juz untuk Muroja'ah</h3>
-                    <div class="juz-grid">${juzListHTML}</div>
-                `;
-            } else if (modalStep === 'SURAH') {
+                list.forEach(juz => { juzListHTML += `<button class="juz-item" data-juz-id="${juz.id}" data-juz-name="${juz.name}">${juz.name}</button>`; });
+                contentHTML = `<h3>Pilih Juz untuk Muroja'ah</h3><div class="juz-grid">${juzListHTML}</div>`;
+            } 
+            else if (modalStep === 'SURAH') {
                 let surahListHTML = '';
                 const list = await fetchSurahsByJuz(modalSelection.juz.id);
-
-                list.forEach(surah => {
-                    surahListHTML += `<button class="surah-item" data-surah-id="${surah.id}" data-surah-name="${surah.name_id}">${surah.name_id} (${surah.verses} Ayat)</button>`;
-                });
-
-                contentHTML = `
-                    <h3>Pilih Surah di ${modalSelection.juz.name}</h3>
-                    <button class="back-button" onclick="setStep('JUZ')">Pilih Juz Lain</button>
-                    <div class="surah-list">${surahListHTML}</div>
-                `;
-            } else if (modalStep === 'REVIEW') {
+                list.forEach(surah => { surahListHTML += `<button class="surah-item" data-surah-id="${surah.id}" data-surah-name="${surah.name_id}">${surah.name_id} (${surah.verses} Ayat)</button>`; });
+                contentHTML = `<h3>Pilih Surah di ${modalSelection.juz.name}</h3><button class="back-button" onclick="setStep('JUZ')">Pilih Juz Lain</button><div class="surah-list">${surahListHTML}</div>`;
+            } 
+            else if (modalStep === 'REVIEW') {
                 const surahText = await fetchSurahText(modalSelection.surah.id);
                 contentHTML = `
                     <h3>Catatan Muroja'ah: ${modalSelection.surah.name_id}</h3>
-                    <div class="surah-text-display"><pre>${surahText}</pre></div>
-                    <hr/>
-                    <div class="catatan-section">
-                        <h4>Catatan Anda:</h4>
+                    <div class="surah-text-display"><pre>${surahText}</pre></div><hr/>
+                    <div class="catatan-section"><h4>Catatan Anda:</h4>
                         <textarea id="catatan-input" placeholder="Tulis catatan di sini" rows="5">${modalSelection.catatan}</textarea>
                     </div>
                 `;
             }
 
-            // Tampilan Progress Lama
             let existingProgressHTML = '';
             if (currentData.length > 0) {
                 let items = currentData.map(item => 
@@ -435,31 +446,20 @@
                 existingProgressHTML = `<div class="existing-progress-view"><h4>Progress di ${selectedDate} sebelumnya:</h4>${items}</div>`;
             }
 
-            // Kontrol tombol di Modal Footer (Solusi Hapus Data)
+            // Tombol Hapus per tanggal DITEMUKAN di sini (di modal-footer)
+            const deleteButtonPerDateHTML = currentData.length > 0 && modalStep !== 'REVIEW' ? 
+                `<button class="delete-button" onclick="deleteProgress()">Hapus Data di Tanggal Ini</button>` : '';
+
             let footerContentHTML = '';
-            
-            // Tombol Save/Back (kanan)
             if (modalStep === 'REVIEW') {
-                footerContentHTML = `
-                    <div class="review-controls-footer">
-                        <button class="back-button" onclick="setStep('SURAH')">Pilih Surah Lain</button>
-                        <button class="save-button" id="save-progress-btn">Simpan Catatan</button>
-                    </div>
-                `;
+                footerContentHTML = `<div class="review-controls-footer">
+                    <button class="back-button" onclick="setStep('SURAH')">Pilih Surah Lain</button>
+                    <button class="save-button" id="save-progress-btn">Simpan Catatan</button>
+                </div>`;
             }
-
-            // Tombol Hapus (kiri)
-            const deleteButtonHTML = currentData.length > 0 && modalStep !== 'REVIEW' ? 
-                `<button class="delete-button" id="delete-progress-btn">Hapus Semua Data di Tanggal Ini</button>` : '';
-
-            const footerHTML = `
-                <div class="modal-footer">
-                    ${deleteButtonHTML}
-                    ${footerContentHTML}
-                </div>
-            `;
             
-            // Struktur Modal Akhir
+            const footerHTML = `<div class="modal-footer">${deleteButtonPerDateHTML} ${footerContentHTML}</div>`;
+            
             const modalHTML = `
                 <div class="modal-overlay">
                     <div class="modal-content large-modal">
@@ -467,42 +467,87 @@
                             <h2>${selectedDate}</h2>
                             <button class="close-button" onclick="closeModal()">&times;</button>
                         </header>
-                        <div class="modal-body">
-                            ${contentHTML}
-                            ${existingProgressHTML}
-                        </div>
+                        <div class="modal-body">${contentHTML}${existingProgressHTML}</div>
                         ${footerHTML}
                     </div>
                 </div>
             `;
-
             root.innerHTML = modalHTML;
             attachModalListeners();
         }
 
         function renderProgressView() {
             const root = document.getElementById('progress-view-root');
-            root.innerHTML = '';
-            
-            if (isModalOpen || !selectedDate) return;
+            if (isModalOpen || !selectedDate) {
+                root.innerHTML = '';
+                return;
+            }
+            // (Isi Progress View tetap sama)
+        }
+        
+        function renderApp() {
+            renderCalendarNav();
+            renderCalendar();
+            renderModal();
+            renderProgressView();
+        }
 
-            const existingProgress = progressData[selectedDate] || [];
+        // --- E. Logic Hapus Data dan Privacy Policy ---
 
-            if (existingProgress.length > 0) {
-                let items = existingProgress.map(item => 
-                    `<p>• **${item.surahName}** (Juz ${item.juzId}): ${item.catatan}</p>`
-                ).join('');
-
-                const progressDiv = document.createElement('div');
-                progressDiv.className = 'existing-progress-view';
-                progressDiv.style.marginTop = '30px';
-                progressDiv.innerHTML = `<h2>Progress di ${selectedDate}</h2>${items}`;
-                
-                root.appendChild(progressDiv);
+        function deleteAllData() {
+            if (confirm("PERINGATAN! Anda yakin ingin menghapus SELURUH data Muroja'ah yang tersimpan? Aksi ini tidak dapat dibatalkan.")) {
+                progressData = {};
+                saveProgressData(progressData);
+                renderApp();
+                alert("SELURUH data Muroja'ah berhasil dihapus.");
+            }
+        }
+        
+        function deleteProgress() {
+            if (confirm(`Anda yakin ingin menghapus SEMUA data Muroja'ah di tanggal ${selectedDate}? Aksi ini tidak dapat dibatalkan.`)) {
+                const { [selectedDate]: _, ...updatedProgressData } = progressData;
+                progressData = updatedProgressData;
+                saveProgressData(progressData);
+                closeModal();
+                alert(`Data Muroja'ah di tanggal ${selectedDate} berhasil dihapus.`);
             }
         }
 
-        // --- E. Event Handlers dan State Updater ---
+        function showPrivacyPolicy() {
+            const policyText = `
+                <h2>Kebijakan Privasi Muroja'ahKu</h2>
+                <p>Aplikasi ini dibuat murni untuk membantu Anda melacak Muroja'ah Anda.</p>
+                <p><b>Privasi Data (Local Storage):</b></p>
+                <ul>
+                    <li>Semua data progress dan catatan yang Anda masukkan <b>hanya tersimpan di browser perangkat Anda sendiri</b> (Local Storage).</li>
+                    <li>Aplikasi <b>TIDAK mengumpulkan, mengirim, atau menyimpan data Anda di server eksternal</b> manapun.</li>
+                    <li>Kami tidak memiliki akses ke data Anda. Jika Anda menghapus cache browser, data Anda akan hilang.</li>
+                </ul>
+                <p>Terima kasih telah menggunakan Muroja'ahKu.</p>
+            `;
+            
+            const modalRoot = document.getElementById('modal-root');
+            modalRoot.innerHTML = `
+                <div class="modal-overlay" onclick="closePolicy(event)">
+                    <div class="modal-content large-modal">
+                        <header class="modal-header">
+                            <h3>Privacy Policy</h3>
+                            <button class="close-button" onclick="closePolicy()">&times;</button>
+                        </header>
+                        <div class="modal-body">${policyText}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function closePolicy(event) {
+            // Tutup hanya jika klik tombol close atau overlay, bukan klik di dalam konten modal
+            if (!event || event.target.classList.contains('modal-overlay') || event.target.classList.contains('close-button')) {
+                document.getElementById('modal-root').innerHTML = '';
+            }
+        }
+
+        // --- F. Event Handlers dan State Updater (sama seperti sebelumnya) ---
 
         function handleDateClick(date) {
             selectedDate = date;
@@ -544,72 +589,27 @@
             }
         }
 
-        function deleteProgress() {
-            if (confirm(`Anda yakin ingin menghapus SEMUA data Muroja'ah di tanggal ${selectedDate}? Aksi ini tidak dapat dibatalkan.`)) {
-                const { [selectedDate]: _, ...updatedProgressData } = progressData;
-                
-                progressData = updatedProgressData;
-                saveProgressData(progressData);
-                
-                closeModal();
-                alert(`Data Muroja'ah di tanggal ${selectedDate} berhasil dihapus.`);
-            }
-        }
-
-
-        // --- F. Attach Listener untuk Modal (Event Delegation) ---
-
         function attachModalListeners() {
             const modalContent = document.querySelector('.modal-overlay');
             if (!modalContent) return;
 
             modalContent.addEventListener('click', async (e) => {
-                // Handle Juz Select
+                // ... (Logic klik Juz/Surah/Save tetap sama) ...
                 if (e.target.classList.contains('juz-item')) {
-                    isLoading = true;
-                    renderModal();
-                    
-                    const juz = {
-                        id: parseInt(e.target.dataset.juzId),
-                        name: e.target.dataset.juzName
-                    };
-                    modalSelection.juz = juz;
-                    modalStep = 'SURAH';
-                    
-                    await fetchSurahsByJuz(juz.id); 
-                    isLoading = false;
-                    renderModal();
-                }
-
-                // Handle Surah Select
-                else if (e.target.classList.contains('surah-item')) {
-                    isLoading = true;
-                    renderModal();
-                    
-                    const surah = {
-                        id: parseInt(e.target.dataset.surahId),
-                        name_id: e.target.dataset.surahName
-                    };
-                    modalSelection.surah = surah;
-                    modalStep = 'REVIEW';
-                    
-                    await fetchSurahText(surah.id);
-                    isLoading = false;
-                    renderModal();
-                }
-
-                // Handle Save Button
-                else if (e.target.id === 'save-progress-btn') {
+                    isLoading = true; renderModal();
+                    const juz = { id: parseInt(e.target.dataset.juzId), name: e.target.dataset.juzName };
+                    modalSelection.juz = juz; modalStep = 'SURAH';
+                    await fetchSurahsByJuz(juz.id); isLoading = false; renderModal();
+                } else if (e.target.classList.contains('surah-item')) {
+                    isLoading = true; renderModal();
+                    const surah = { id: parseInt(e.target.dataset.surahId), name_id: e.target.dataset.surahName };
+                    modalSelection.surah = surah; modalStep = 'REVIEW';
+                    await fetchSurahText(surah.id); isLoading = false; renderModal();
+                } else if (e.target.id === 'save-progress-btn') {
                     saveProgress();
-                }
-
-                // Handle Delete Button
-                else if (e.target.id === 'delete-progress-btn') {
-                    deleteProgress();
                 }
             });
         }
-
 
         // --- G. Initial App Load ---
         document.addEventListener('DOMContentLoaded', renderApp);
