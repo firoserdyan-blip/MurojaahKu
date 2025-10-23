@@ -1,11 +1,18 @@
 /* --- styles.css: Tambahan di bagian paling bawah --- */
 
-.modal-controls {
+.modal-footer {
     display: flex;
-    justify-content: space-between; /* Untuk memisahkan tombol save/back dengan tombol delete */
+    justify-content: space-between; /* Membuat tombol hapus (kiri) dan simpan (kanan) terpisah */
     align-items: center;
     padding-top: 15px;
+    margin-top: 10px; 
     border-top: 1px solid #eee;
+}
+
+.review-controls-footer {
+    /* Wadah untuk tombol Back dan Save agar tetap berdekatan di sisi kanan */
+    display: flex;
+    gap: 10px;
 }
 
 .delete-button {
