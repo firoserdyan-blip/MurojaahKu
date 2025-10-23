@@ -25,6 +25,9 @@
             padding: 5px 10px; 
             border-radius: 5px;
             transition: background-color 0.2s;
+            /* Perbaikan Z-index agar bisa diklik jika ada element lain yang menghalangi */
+            position: relative;
+            z-index: 10; 
         }
         .month-year-select:hover {
             background-color: #e0e0e0;
@@ -58,7 +61,7 @@
             border-radius: 5px;
             padding: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1010;
+            z-index: 1010; /* Z-index tinggi untuk memastikan di atas yang lain */
             display: flex;
             gap: 10px;
         }
@@ -77,16 +80,19 @@
             cursor: pointer;
         }
         
-        /* Kontrol Aksi Bawah Kalender */
+        /* Kontrol Aksi Bawah Kalender (Hapus Data Global) */
         .app-controls { 
             display: flex; 
-            justify-content: flex-end; 
+            justify-content: flex-end; /* Memindahkan "Hapus SELURUH Data" ke kanan */
             align-items: center; 
             padding-top: 15px; 
             margin-top: 20px; 
         }
+        .delete-all-button { background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; font-weight: bold; }
+        .delete-all-button:hover { background-color: #c82333; }
+
         
-        /* Tombol Aksi Paling Bawah */
+        /* Tombol Aksi Paling Bawah (Info & Privacy) */
         .bottom-controls {
             display: flex;
             justify-content: space-between;
@@ -124,8 +130,28 @@
 
 
         /* Modal & Scrolling */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 20px; border-radius: 8px; max-height: 90vh; overflow-y: auto; width: 90%; max-width: 800px; }
+        .modal-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0, 0, 0, 0.7); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 2000; /* Z-index sangat tinggi untuk modal */
+        }
+        .modal-content { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            width: 90%; 
+            max-width: 800px;
+            position: relative;
+        }
         
         /* Font Arab */
         .surah-text-display pre { 
@@ -144,8 +170,24 @@
         .calendar-day.today { border: 2px solid #007bff; font-weight: bold; }
         .calendar-day.has-data { background-color: #d4edda; border: 1px solid #c3e6cb; }
         .indicator { position: absolute; top: 2px; right: 2px; color: green; font-size: 0.9em; }
-        .delete-all-button { background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; font-weight: bold; }
-        
+
+        /* Gaya Tombol Modal Juz/Surah */
+        .juz-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; max-height: 300px; overflow-y: auto; padding-right: 10px; }
+        .surah-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        .juz-item, .surah-item { 
+            padding: 15px; 
+            border: 1px solid #007bff; 
+            background-color: #e9f5ff; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 1em; 
+            transition: background-color 0.2s; 
+            text-align: center;
+            width: 100%; /* Penting untuk grid/flex */
+        }
+        .juz-item:hover, .surah-item:hover { background-color: #cce5ff; }
+        .back-button { background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 15px; }
+        .save-button { background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -173,7 +215,6 @@
         </div>
         
         <div id="modal-root"></div>
-        <div id="progress-view-root"></div>
     </div>
 
     <script>
@@ -201,7 +242,8 @@
         }
 
         let progressData = getProgressData();
-        let isModalOpen = false;
+        let isModalOpen = false; // Status untuk modal input data
+        let isInfoModalOpen = false; // Status baru untuk modal info/policy
         let selectedDate = '';
         let modalStep = 'JUZ';
         let modalSelection = { juz: null, surah: null, catatan: '' };
@@ -254,13 +296,14 @@
             
             try {
                 isLoading = true; renderModal();
+                
                 const response = await fetch(API_URL);
                 if (!response.ok) {
                     throw new Error(`Gagal mengambil data dari API (Status: ${response.status}).`);
                 }
                 const data = await response.json();
                 
-                let surahText = `بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\n\n`;
+                let surahText = `بِسْمِ ٱللَّهِ ٱٱلرَّحْمَٰنِ ٱلرَّحِيمِ\n\n`;
                 
                 if (data.data && data.data.ayahs) {
                     data.data.ayahs.forEach(ayah => {
@@ -304,10 +347,12 @@
         
         function renderMonthYearDropdown() {
             const container = document.getElementById('month-year-select-container');
+            
+            // Hapus listener dari body setiap kali merender, untuk mencegah duplikasi
+            document.body.removeEventListener('click', closeDropdownOnOutsideClick);
+
             if (!isDropdownOpen) {
                 container.innerHTML = '';
-                // Hapus listener jika dropdown ditutup
-                document.body.removeEventListener('click', closeDropdownOnOutsideClick);
                 return;
             }
 
@@ -322,7 +367,7 @@
                 yearOptions += `<option value="${y}" ${y === currentYearValue ? 'selected' : ''}>${y}</option>`;
             }
 
-            // Tentukan posisi dropdown di bawah elemen span yang diklik (sedikit tricky di vanilla JS, tapi kita letakkan di bawah container kalender)
+            // Margin disesuaikan agar posisinya lebih baik di bawah nav
             container.innerHTML = `
                 <div id="month-year-dropdown" style="margin-top: -10px; margin-left: 20px;">
                     <select id="month-select">${monthOptions}</select>
@@ -332,7 +377,6 @@
             `;
             
             // Tambahkan listener untuk menutup dropdown saat klik di luar
-            // Ini harus dilakukan setelah dropdown dibuat di DOM
             setTimeout(() => {
                 document.body.addEventListener('click', closeDropdownOnOutsideClick);
             }, 0);
@@ -374,7 +418,6 @@
             renderApp();
         }
         
-        // FUNGSI INTI: Kembali ke hari ini
         function goToToday() {
             const today = new Date();
             currentMonth = today.getMonth();
@@ -436,14 +479,19 @@
             root.appendChild(calendarGrid);
         }
 
-        // --- D. Fungsi Modal dan Logic ---
+        // --- D. Fungsi Modal dan Logic (Modal Input Data) ---
         
         async function renderModal() {
             const root = document.getElementById('modal-root');
-            if (!isModalOpen) {
+            
+            // Jika modal input data tidak terbuka DAN modal info juga tidak terbuka, kosongkan root
+            if (!isModalOpen && !isInfoModalOpen) {
                 root.innerHTML = '';
                 return;
             }
+            
+            // Jangan merender modal input data jika modal info sedang terbuka
+            if (isInfoModalOpen) return;
 
             let contentHTML = '';
             let currentData = progressData[selectedDate] || [];
@@ -456,12 +504,15 @@
             else if (modalStep === 'JUZ') {
                 let juzListHTML = '';
                 const list = await fetchJuzList();
+                // FIX: Menampilkan Juz secara rapi per baris 2 kolom
+                juzListHTML = `<div class="juz-grid">`;
                 list.forEach(juz => { 
                     const buttonText = juz.name; 
                     juzListHTML += `<button class="juz-item" data-juz-id="${juz.id}" data-juz-name="${juz.name}">${buttonText}</button>`; 
                 });
+                juzListHTML += `</div>`;
                 
-                contentHTML = `<h3>Pilih Juz untuk Muroja'ah (Scroll untuk melihat 30 Juz)</h3><div class="juz-grid">${juzListHTML}</div>`;
+                contentHTML = `<h3>Pilih Juz untuk Muroja'ah (Scroll untuk melihat 30 Juz)</h3>${juzListHTML}`;
             } 
             else if (modalStep === 'SURAH') {
                 let surahListHTML = '';
@@ -470,12 +521,15 @@
                 if (list && list.length === 0) {
                      surahListHTML = `<p>Tidak ada data surah di Juz ini.</p>`;
                 } else {
+                     surahListHTML = `<div class="surah-list">`;
+                     // FIX: Menampilkan Surah sebagai daftar vertikal
                      list.forEach(surah => { 
                          surahListHTML += `<button class="surah-item" data-surah-id="${surah.id}" data-surah-name="${surah.name}">${surah.name} (${surah.verses} Ayat)</button>`; 
                      });
+                     surahListHTML += `</div>`;
                 }
                 
-                contentHTML = `<h3>Pilih Surah di ${modalSelection.juz.name} (Scroll jika banyak)</h3><button class="back-button" onclick="setStep('JUZ')">Pilih Juz Lain</button><div class="surah-list">${surahListHTML}</div>`;
+                contentHTML = `<h3>Pilih Surah di ${modalSelection.juz.name}</h3><button class="back-button" onclick="setStep('JUZ')">Pilih Juz Lain</button>${surahListHTML}`;
             } 
             else if (modalStep === 'REVIEW') {
                 const surahText = modalSelection.surah.text || "Gagal memuat teks Al-Qur'an.";
@@ -502,27 +556,25 @@
 
             let footerContentHTML = '';
             if (modalStep === 'REVIEW') {
-                footerContentHTML = `<div class="review-controls-footer">
+                footerContentHTML = `<div class="review-controls-footer" style="display:flex; justify-content:space-between; margin-top:20px;">
                     <button class="back-button" onclick="setStep('SURAH')">Pilih Surah Lain</button>
                     <button class="save-button" id="save-progress-btn">Simpan Catatan</button>
                 </div>`;
             }
             
             const footerHTML = `
-                <div class="modal-footer">
+                <div class="modal-footer" style="padding-top: 10px;">
                     ${modalStep !== 'REVIEW' ? deleteButtonPerDateHTML : ''}
-                    <div class="review-controls-footer">
-                       ${footerContentHTML}
-                    </div>
+                    ${footerContentHTML}
                 </div>
             `;
             
             const modalHTML = `
-                <div class="modal-overlay">
+                <div class="modal-overlay" id="data-modal-overlay">
                     <div class="modal-content large-modal">
-                        <header class="modal-header">
+                        <header class="modal-header" style="display:flex; justify-content:space-between; align-items:center;">
                             <h2>${selectedDate}</h2>
-                            <button class="close-button" onclick="closeModal()">&times;</button>
+                            <button class="close-button" onclick="closeModal()" style="font-size: 1.5em; border: none; background: none; cursor: pointer;">&times;</button>
                         </header>
                         <div class="modal-body">${contentHTML}${existingProgressHTML}</div>
                         ${footerHTML}
@@ -530,17 +582,53 @@
                 </div>
             `;
             root.innerHTML = modalHTML;
-            attachModalListeners();
+            // PENTING: Panggil listener lagi setiap kali modal dirender
+            attachModalListeners(); 
         }
         
         function renderApp() {
-            renderCalendarNav();
-            renderCalendar();
-            renderModal();
+            // Pastikan modal input data dan info tidak tumpang tindih
+            if (!isInfoModalOpen) {
+                renderCalendarNav();
+                renderCalendar();
+                renderModal(); 
+            }
+        }
+        
+        // --- E. Fungsi Info & Privacy (Perbaikan Logic Modal Info) ---
+        
+        function showInfoModal(title, content) {
+            const modalRoot = document.getElementById('modal-root');
+            // Tutup modal input data jika sedang terbuka
+            isModalOpen = false;
+            isInfoModalOpen = true;
+            
+            modalRoot.innerHTML = `
+                <div class="modal-overlay" onclick="closeInfoModal(event)">
+                    <div class="modal-content large-modal" onclick="event.stopPropagation()">
+                        <header class="modal-header" style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3>${title}</h3>
+                            <button class="close-button" onclick="closeInfoModal()" style="font-size: 1.5em; border: none; background: none; cursor: pointer;">&times;</button>
+                        </header>
+                        <div class="modal-body">${content}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function closeInfoModal(event) {
+             // Logic perbaikan: Hanya tutup jika klik overlay atau tombol close
+            if (!event || event.target.classList.contains('modal-overlay') || event.target.classList.contains('close-button')) {
+                document.getElementById('modal-root').innerHTML = '';
+                isInfoModalOpen = false;
+                renderApp(); // Re-render setelah menutup modal info
+            }
+            if (event && event.target.classList.contains('modal-overlay')) {
+                event.stopPropagation(); // Mencegah klik menyebar ke elemen di belakang
+            }
         }
 
-        // --- E. Fungsi Info & Privacy (Teks Rapi) ---
-        
+        // Teks Rapi (Dipertahankan)
         function showAboutWebsite() {
             const policyText = `
                 <h2>Tentang Website MurojaahKu & Fiturnya</h2>
@@ -558,7 +646,6 @@
                     <li><b>Hapus Data Global & Harian:</b> Kontrol penuh untuk menghapus data Anda kapan saja.</li>
                 </ol>
             `;
-            
             showInfoModal("Tentang Website & Fitur", policyText);
         }
 
@@ -581,36 +668,11 @@
                     <li>Koneksi internet diperlukan agar fitur tampilan teks Al-Qur'an berfungsi dengan benar.</li>
                 </ul>
             `;
-            
             showInfoModal("Privacy Policy", policyText);
         }
         
-        function showInfoModal(title, content) {
-            const modalRoot = document.getElementById('modal-root');
-            // Menutup modal entri data jika sedang terbuka
-            isModalOpen = false;
-            
-            modalRoot.innerHTML = `
-                <div class="modal-overlay" onclick="closeInfoModal(event)">
-                    <div class="modal-content large-modal">
-                        <header class="modal-header">
-                            <h3>${title}</h3>
-                            <button class="close-button" onclick="closeInfoModal()">&times;</button>
-                        </header>
-                        <div class="modal-body">${content}</div>
-                    </div>
-                </div>
-            `;
-            renderApp(); // Render ulang untuk memastikan modal entri data tertutup
-        }
-        
-        function closeInfoModal(event) {
-            if (!event || event.target.classList.contains('modal-overlay') || event.target.classList.contains('close-button')) {
-                document.getElementById('modal-root').innerHTML = '';
-            }
-        }
 
-        // --- F. Event Handlers dan Initial Load ---
+        // --- F. Event Handlers dan Data Management (Perbaikan Listener) ---
 
         function handleDateClick(date) {
             selectedDate = date;
@@ -620,13 +682,97 @@
             renderApp();
         }
 
-        function closeModal() {
-            isModalOpen = false;
-            selectedDate = '';
-            renderApp();
+        function setStep(step) {
+            modalStep = step;
+            if (step !== 'REVIEW' && modalSelection.surah) {
+                modalSelection.surah.text = null; 
+            }
+            renderModal();
+        }
+
+        function saveProgress() {
+            const catatanInput = document.getElementById('catatan-input');
+            const catatan = catatanInput ? catatanInput.value : '';
+
+            if (modalSelection.surah) {
+                const newData = {
+                    juzId: modalSelection.juz.id,
+                    surahId: modalSelection.surah.id,
+                    surahName: modalSelection.surah.name,
+                    catatan: catatan,
+                    timestamp: new Date().toISOString()
+                };
+
+                const currentData = progressData[selectedDate] ? [...progressData[selectedDate], newData] : [newData];
+                progressData = { ...progressData, [selectedDate]: currentData };
+                saveProgressData(progressData);
+                
+                closeModal();
+            }
         }
         
-        // ... (Fungsi setStep, saveProgress, attachModalListeners, deleteAllData, deleteProgress tetap sama)
+        // FIX: Hapus Data Global
+        function deleteAllData() {
+            if (confirm("PERINGATAN! Anda yakin ingin menghapus SELURUH data Muroja'ah yang tersimpan? Aksi ini tidak dapat dibatalkan.")) {
+                progressData = {};
+                saveProgressData(progressData);
+                renderApp();
+                alert("SELURUH data Muroja'ah berhasil dihapus.");
+            }
+        }
+        
+        // FIX: Hapus Data Harian
+        function deleteProgress() {
+            if (confirm(`Anda yakin ingin menghapus SEMUA data Muroja'ah di tanggal ${selectedDate}? Aksi ini tidak dapat dibatalkan.`)) {
+                const { [selectedDate]: _, ...updatedProgressData } = progressData;
+                progressData = updatedProgressData;
+                saveProgressData(progressData);
+                closeModal();
+                alert(`Data Muroja'ah di tanggal ${selectedDate} berhasil dihapus.`);
+            }
+        }
+
+
+        // FIX PENTING: Menggunakan Event Delegation untuk elemen yang dirender ulang
+        function attachModalListeners() {
+            const modalContent = document.querySelector('.modal-content');
+            if (!modalContent) return;
+
+            // FIX: Tambahkan event listener ke elemen statis yang membungkus konten dinamis (modalContent)
+            modalContent.addEventListener('click', async (e) => {
+                
+                // Handle Juz Select
+                if (e.target.classList.contains('juz-item')) {
+                    isLoading = true; renderModal();
+                    const juzId = parseInt(e.target.dataset.juzId);
+                    const juz = JUZ_DATA.find(j => j.id === juzId);
+
+                    modalSelection.juz = juz; 
+                    modalStep = 'SURAH';
+                    
+                    isLoading = false; renderModal();
+                } 
+                // Handle Surah Select (Memanggil API)
+                else if (e.target.classList.contains('surah-item')) {
+                    const surahId = parseInt(e.target.dataset.surahId);
+                    const surahName = e.target.dataset.surahName;
+                    
+                    modalSelection.surah = { id: surahId, name: surahName, text: null };
+                    
+                    // Ambil teks API
+                    const surahText = await fetchSurahText(surahId, surahName);
+                    
+                    modalSelection.surah.text = surahText;
+                    
+                    modalStep = 'REVIEW';
+                    renderModal();
+                } 
+                // Handle Save Button
+                else if (e.target.id === 'save-progress-btn') {
+                    saveProgress();
+                }
+            });
+        }
 
         // --- G. Initial App Load ---
         document.addEventListener('DOMContentLoaded', renderApp);
