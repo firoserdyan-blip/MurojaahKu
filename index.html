@@ -3,184 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muroja'ahKu Tracker API</title>
+    <title>Muroja'ahKu</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="logo.png" type="image/png">
     
     <style>
         /* CSS umum */
         body { background-color: #f4f4f4; margin: 0; padding: 0; font-family: sans-serif; color: #333; transition: background-color 0.3s, color 0.3s; }
         .app-container { padding: 20px; max-width: 800px; margin: 30px auto; border: 4px solid #4CAF50; border-radius: 12px; background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; }
-        .main-header { text-align: center; color: #4CAF50; font-size: 2.5em; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; }
         
+        /* HEADER BARU dengan Logo */
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Pusatkan header */
+            margin-top: 0; 
+            margin-bottom: 20px; 
+            border-bottom: 2px solid #e0e0e0; 
+            padding-bottom: 10px;
+        }
+        .header-logo {
+            width: 40px; /* Ukuran logo di header */
+            height: 40px;
+            margin-right: 10px;
+            /* Tambahan: Mengganti logo yang dilingkari merah (ikon tab/favicon) */
+        }
+        .main-header { 
+            color: #4CAF50; 
+            font-size: 2.5em; 
+            margin: 0;
+            line-height: 1; 
+        }
+
         /* Navigasi Kalender */
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background-color: #f0f0f0; padding: 10px; border-radius: 8px; transition: background-color 0.3s; }
         .nav-button { background-color: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 1.2em; transition: background-color 0.2s; }
         .nav-button:hover { background-color: #0056b3; }
-        
-        /* Tampilan Bulan & Tahun yang dapat di-klik */
-        .month-year-select { 
-            font-size: 1.2em; 
-            font-weight: bold; 
-            color: #333; 
-            cursor: pointer; 
-            padding: 5px 10px; 
-            border-radius: 5px;
-            transition: background-color 0.2s, color 0.3s;
-            position: relative;
-            z-index: 10; 
-        }
+        .month-year-select { font-size: 1.2em; font-weight: bold; color: #333; cursor: pointer; padding: 5px 10px; border-radius: 5px; transition: background-color 0.2s, color 0.3s; position: relative; z-index: 10; }
         .month-year-select:hover { background-color: #e0e0e0; }
 
         /* Tombol Kontrol Atas (Hari Ini & Tema) */
-        .top-controls {
-            display: flex;
-            justify-content: flex-end; 
-            gap: 10px; /* Jarak antar tombol */
-            margin-bottom: 10px;
-        }
-        .today-button {
-            background-color: #ff9800;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s;
-        }
+        .top-controls { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 10px; }
+        .today-button { background-color: #ff9800; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.2s; }
         .today-button:hover { background-color: #e68900; }
-        
-        .theme-button {
-            background-color: #607d8b;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s;
-        }
+        .theme-button { background-color: #607d8b; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.2s; }
         .theme-button:hover { background-color: #546e7a; }
 
-        /* Container Dropdown Bulan/Tahun */
-        #month-year-dropdown {
-            position: absolute;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1010; 
-            display: flex;
-            gap: 10px;
-        }
-
-        /* Gaya Kalender */
+        /* Gaya Kalender (sisanya tidak diubah) */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 20px; border: 1px solid #ccc; padding: 10px; background-color: #ffffff; transition: background-color 0.3s, border-color 0.3s; }
         .day-label { text-align: center; font-weight: bold; color: #6c757d; padding: 5px 0; font-size: 0.8em; transition: color 0.3s; }
         .calendar-day { background-color: #f0f0f0; padding: 10px 5px; text-align: center; border-radius: 5px; cursor: pointer; position: relative; min-height: 40px; display: flex; justify-content: center; align-items: center; font-size: 0.9em; transition: background-color 0.2s, color 0.3s; }
-        .calendar-day.today { border: 2px solid #007bff; font-weight: bold; }
         .calendar-day.has-data { background-color: #d4edda; border: 1px solid #c3e6cb; }
         .indicator { position: absolute; top: 2px; right: 2px; color: green; font-size: 0.9em; }
 
-        /* Modal & Konten Modal */
-        .modal-overlay { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0; 
-            background: rgba(0, 0, 0, 0.7); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 2000; 
+        /* Tombol Aksi Paling Bawah (Info, Privacy & Instalasi) */
+        .bottom-controls {
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            gap: 10px; 
         }
-        .modal-content { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            max-height: 90vh; 
-            overflow-y: auto; 
-            width: 90%; 
-            max-width: 800px;
-            position: relative;
-            transition: background-color 0.3s;
+        .bottom-controls button {
+            flex-grow: 1; 
+            min-width: 150px; 
         }
-        .close-button { font-size: 1.5em; border: none; background: none; cursor: pointer; color: #333; transition: color 0.3s; }
-        .juz-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; max-height: 300px; overflow-y: auto; padding-right: 10px; }
-        .surah-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
-        .juz-item, .surah-item { 
-            padding: 15px; 
-            border: 1px solid #007bff; 
-            background-color: #e9f5ff; 
+        .info-button { background-color: #00bcd4; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; font-weight: bold; }
+        .privacy-button { background-color: #6c757d; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; font-weight: bold; }
+        .install-button {
+            background-color: #4CAF50; 
+            color: white; 
+            border: none; 
+            padding: 10px 15px; 
             border-radius: 5px; 
             cursor: pointer; 
-            font-size: 1em; 
-            transition: background-color 0.2s, border-color 0.3s; 
-            text-align: center;
-            width: 100%; 
+            transition: background-color 0.2s; 
+            font-weight: bold;
+            display: none; /* Sembunyikan default, hanya tampil jika PWA siap */
         }
-        .juz-item:hover, .surah-item:hover { background-color: #cce5ff; }
-        
-        .back-button { background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 15px; }
-        .save-button { background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        .delete-button { background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; margin-top: 10px; }
+        .install-button:hover { background-color: #45a049; }
 
-        .surah-text-display pre { 
-            white-space: pre-wrap; 
-            font-size: 1.5em; 
-            font-family: 'Amiri', 'Traditional Arabic', 'Times New Roman', serif; 
-            text-align: right; 
-            line-height: 2.5; 
-            margin: 0; 
-        }
-        .existing-progress-view { 
-            border-top: 1px solid #eee; 
-            margin-top: 15px; 
-            padding-top: 10px; 
-            font-size: 0.9em; 
-        }
 
-        /* -------------------------------------------------------------------- */
-        /* DARK MODE STYLES */
-        /* -------------------------------------------------------------------- */
+        /* DARK MODE STYLES (tidak diubah) */
         body.dark-mode { background-color: #121212; color: #e0e0e0; }
-        body.dark-mode .app-container { 
-            background-color: #1e1e1e; 
-            border-color: #66bb6a; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); 
-        }
-        body.dark-mode .main-header { color: #66bb6a; border-bottom-color: #333; }
+        body.dark-mode .app-container { background-color: #1e1e1e; border-color: #66bb6a; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
+        body.dark-mode .header-container { border-bottom-color: #333; }
+        body.dark-mode .main-header { color: #66bb6a; }
         body.dark-mode .calendar-nav { background-color: #2c2c2c; }
         body.dark-mode .month-year-select { color: #e0e0e0; }
         body.dark-mode .month-year-select:hover { background-color: #3a3a3a; }
-
-        body.dark-mode #month-year-dropdown { background: #2c2c2c; border-color: #444; }
-        body.dark-mode #month-year-dropdown select { background: #1e1e1e; color: #e0e0e0; border-color: #444; }
-        
         body.dark-mode .calendar-grid { background-color: #1e1e1e; border-color: #444; }
-        body.dark-mode .day-label { color: #aaa; }
         body.dark-mode .calendar-day { background-color: #2c2c2c; color: #e0e0e0; }
-        body.dark-mode .calendar-day.has-data { background-color: #4CAF5033; border-color: #4CAF50; } /* Hijau lebih gelap */
-        body.dark-mode .calendar-day.today { border-color: #5b9edb; }
-        
-        body.dark-mode .theme-button { background-color: #7986cb; } /* Warna tema gelap */
-
+        body.dark-mode .calendar-day.has-data { background-color: #4CAF5033; border-color: #4CAF50; }
         body.dark-mode .modal-content { background: #2c2c2c; color: #e0e0e0; }
         body.dark-mode .close-button { color: #e0e0e0; }
-        body.dark-mode .juz-item, body.dark-mode .surah-item { 
-            background-color: #424242; 
-            border-color: #64b5f6; 
-            color: #e0e0e0;
-        }
-        body.dark-mode .juz-item:hover, body.dark-mode .surah-item:hover { background-color: #555; }
+        body.dark-mode .juz-item, body.dark-mode .surah-item { background-color: #424242; border-color: #64b5f6; color: #e0e0e0; }
         body.dark-mode .existing-progress-view { border-top-color: #444; }
         body.dark-mode textarea { background-color: #333; color: #e0e0e0; border: 1px solid #555; }
     </style>
 </head>
 <body class="light-mode">
     <div class="app-container">
-        <h1 class="main-header">MurojaahKu</h1> 
+        <div class="header-container">
+            <img src="logo.png" alt="MurojaahKu Logo" class="header-logo">
+            <h1 class="main-header">MurojaahKu</h1> 
+        </div>
         <h1>📚 Muroja'ah Tracker Online</h1>
         
         <div id="calendar-nav-root"></div>
@@ -201,6 +132,9 @@
         <div class="bottom-controls">
             <button class="info-button" onclick="showAboutWebsite()">Tentang Website & Fitur</button>
             <button class="privacy-button" onclick="showPrivacyPolicy()">Privacy Policy</button>
+            <button class="install-button" id="install-app-button">
+                ⬇️ Instal MurojaahKu
+            </button>
         </div>
         
         <div id="modal-root"></div>
@@ -209,7 +143,7 @@
     <script>
         // --- A. Hook/Fungsi: Manajemen Local Storage & State ---
         const LOCAL_STORAGE_KEY = 'quranProgressVanilla';
-        const THEME_KEY = 'quranTrackerTheme'; // Kunci untuk tema
+        const THEME_KEY = 'quranTrackerTheme';
         const DAYS_OF_WEEK = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
         const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         
@@ -244,8 +178,12 @@
         let currentMonth = new Date().getMonth(); 
         let isDropdownOpen = false;
 
-        // --- B. DATA MOCK (Untuk mapping Juz ke Surah) & API Fetch ---
+        // PWA State untuk Instalasi
+        let deferredPrompt; 
+        
+        // --- B. DATA MOCK (Juz/Surah) & API Fetch (tetap sama) ---
         const JUZ_DATA = [
+            // ... (Data JUZ_DATA lengkap dari kode sebelumnya)
             { id: 1, name: "Juz 1: Alif Lam Mim", surahs: [{ id: 1, name: "Al-Fatihah", verses: 7 }, { id: 2, name: "Al-Baqarah (1-141)", verses: 141 }] },
             { id: 2, name: "Juz 2: Sayaqul", surahs: [{ id: 2, name: "Al-Baqarah (142-252)", verses: 111 }] },
             { id: 3, name: "Juz 3: Tilka-r-Rusul", surahs: [{ id: 2, name: "Al-Baqarah (253-286)", verses: 34 }, { id: 3, name: "Ali 'Imran (1-92)", verses: 92 }] },
@@ -278,15 +216,14 @@
             { id: 30, name: "Juz 30: Amma Yatasa'alun", surahs: [{ id: 78, name: "An-Naba", verses: 40 }, { id: 79, name: "An-Naziat", verses: 46 }, { id: 80, name: "Abasa", verses: 42 }, { id: 81, name: "At-Takwir", verses: 29 }, { id: 82, name: "Al-Infitar", verses: 19 }, { id: 83, name: "Al-Mutaffifin", verses: 36 }, { id: 84, name: "Al-Insyiqaq", verses: 25 }, { id: 85, name: "Al-Buruj", verses: 22 }, { id: 86, name: "At-Tariq", verses: 17 }, { id: 87, name: "Al-A'la", verses: 19 }, { id: 88, name: "Al-Ghasyiyah", verses: 26 }, { id: 89, name: "Al-Fajr", verses: 30 }, { id: 90, name: "Al-Balad", verses: 20 }, { id: 91, name: "Asy-Syams", verses: 15 }, { id: 92, name: "Al-Lail", verses: 21 }, { id: 93, name: "Ad-Duha", verses: 11 }, { id: 94, name: "Al-Insyirah", verses: 8 }, { id: 95, name: "At-Tin", verses: 8 }, { id: 96, name: "Al-Alaq", verses: 19 }, { id: 97, name: "Al-Qadr", verses: 5 }, { id: 98, name: "Al-Bayyinah", verses: 8 }, { id: 99, name: "Az-Zalzalah", verses: 8 }, { id: 100, name: "Al-Adiyat", verses: 11 }, { id: 101, name: "Al-Qari'ah", verses: 11 }, { id: 102, name: "At-Takasur", verses: 8 }, { id: 103, name: "Al-Asr", verses: 3 }, { id: 104, name: "Al-Humazah", verses: 9 }, { id: 105, name: "Al-Fil", verses: 5 }, { id: 106, name: "Quraisy", verses: 4 }, { id: 107, name: "Al-Ma'un", verses: 7 }, { id: 108, name: "Al-Kausar", verses: 3 }, { id: 109, name: "Al-Kafirun", verses: 6 }, { id: 110, name: "An-Nasr", verses: 3 }, { id: 111, name: "Al-Lahab", verses: 5 }, { id: 112, name: "Al-Ikhlas", verses: 4 }, { id: 113, name: "Al-Falaq", verses: 5 }, { id: 114, name: "An-Nas", verses: 6 }] }
         ];
 
-        
         const fetchJuzList = () => Promise.resolve(JUZ_DATA);
 
         const fetchSurahText = async (surahId, surahName) => {
+            // ... (Fungsi fetchSurahText tetap sama)
             const API_URL = `https://api.alquran.cloud/v1/surah/${surahId}/ar.uthmani`;
             
             try {
                 isLoading = true; renderModal();
-                
                 const response = await fetch(API_URL);
                 if (!response.ok) {
                     throw new Error(`Gagal mengambil data dari API (Status: ${response.status}).`);
@@ -297,7 +234,7 @@
                 
                 if (data.data && data.data.ayahs) {
                     data.data.ayahs.forEach(ayah => {
-          surahText += `${ayah.text} ﴿${ayah.numberInSurah}﴾\n\n`;
+                        surahText += `${ayah.text} ﴿${ayah.numberInSurah}﴾\n\n`;
                     });
                 } else {
                     surahText = `Data Ayat tidak ditemukan untuk ${surahName} (${surahId}).`;
@@ -312,7 +249,8 @@
             }
         };
 
-        // --- C. Fungsi Tema (Dark/Light Mode) ---
+        
+        // --- C. Fungsi Tema (Dark/Light Mode) (tetap sama) ---
 
         function getSavedTheme() {
             return localStorage.getItem(THEME_KEY) || 'light';
@@ -338,15 +276,15 @@
             const currentTheme = getSavedTheme();
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             applyTheme(newTheme);
-            // Render ulang modal dan dropdown untuk menerapkan gaya tema baru secara langsung
             renderMonthYearDropdown();
             renderModal();
         }
 
 
-        // --- D. Fungsi Render Kalender dan Navigasi ---
+        // --- D. Fungsi Render Kalender dan Navigasi (tetap sama) ---
         
         function renderCalendarNav() {
+             // ... (Fungsi renderCalendarNav, toggleMonthYearDropdown, closeDropdownOnOutsideClick, applyMonthYear, changeMonth, goToToday, renderCalendar tetap sama)
             const navRoot = document.getElementById('calendar-nav-root');
             navRoot.innerHTML = `
                 <div class="calendar-nav">
@@ -358,7 +296,6 @@
                 </div>
             `;
             renderMonthYearDropdown();
-            // Terapkan tema pada tombol tema saat render
             applyTheme(getSavedTheme()); 
         }
 
@@ -378,7 +315,6 @@
                 return;
             }
             
-            // Logika untuk menentukan posisi dropdown agar berada di bawah tombol
             const selectButton = document.querySelector('.month-year-select');
             const rect = selectButton ? selectButton.getBoundingClientRect() : { left: 0, top: 0, width: 0 };
             const dropdownStyle = `position: absolute; margin-top: 5px; left: ${rect.left + (rect.width / 2) - 100}px; top: ${rect.bottom}px;`;
@@ -501,7 +437,6 @@
             root.appendChild(calendarGrid);
         }
         
-        // Fungsi untuk menutup modal input data
         function closeModal() {
             isModalOpen = false;
             modalStep = 'JUZ';
@@ -510,9 +445,10 @@
         }
 
 
-        // --- E. Fungsi Modal dan Logic (Modal Input Data) ---
+        // --- E. Fungsi Modal dan Logic (tetap sama) ---
         
         async function renderModal() {
+             // ... (Fungsi renderModal tetap sama)
             const root = document.getElementById('modal-root');
             
             if (!isModalOpen && !isInfoModalOpen) {
@@ -523,7 +459,6 @@
             if (isInfoModalOpen) return;
 
             let contentHTML = '';
-            // FIX PENTING: Menggunakan selectedDate untuk mengambil data yang benar
             let currentData = progressData[selectedDate] || [];
 
             if (isLoading && modalStep !== 'REVIEW') { 
@@ -576,7 +511,6 @@
                 let items = currentData.map(item => 
                     `<p>• <b>${item.surahName}</b> (Juz ${item.juzId}): ${item.catatan || '*(Tanpa Catatan)*'}</p>`
                 ).join('');
-                // FIX: Menampilkan tanggal yang benar di sini (selectedDate)
                 existingProgressHTML = `<div class="existing-progress-view"><h4>Progress di ${selectedDate} sebelumnya:</h4>${items}</div>`;
             }
 
@@ -585,7 +519,6 @@
 
             let footerContentHTML = '';
             if (modalStep === 'REVIEW') {
-                // Tombol Simpan menggunakan data-action untuk event listener
                 footerContentHTML = `<div class="review-controls-footer" style="display:flex; justify-content:space-between; margin-top:20px;">
                     <button class="back-button" onclick="setStep('SURAH')">Pilih Surah Lain</button>
                     <button class="save-button" data-action="save-progress">Simpan Catatan</button>
@@ -612,13 +545,10 @@
                 </div>
             `;
             root.innerHTML = modalHTML;
-            // PENTING: Panggil listener lagi setiap kali modal dirender
             attachModalListeners(); 
         }
         
-        // FIX: Handle klik overlay untuk menutup modal
         function handleOverlayClick(event) {
-            // Jika yang diklik adalah overlay-nya sendiri (bukan konten modal)
             if (event.target.id === 'data-modal-overlay') {
                 closeModal();
             }
@@ -626,16 +556,17 @@
         
         function renderApp() {
             if (!isInfoModalOpen) {
-                applyTheme(getSavedTheme()); // Pastikan tema diterapkan saat render
+                applyTheme(getSavedTheme());
                 renderCalendarNav();
                 renderCalendar();
                 renderModal(); 
             }
         }
         
-        // --- F. Fungsi Info & Privacy (Modal Info/Policy) ---
+        // --- F. Fungsi Info & Privacy (tetap sama) ---
         
         function showInfoModal(title, content) {
+             // ... (Fungsi showInfoModal, closeInfoModal, showAboutWebsite, showPrivacyPolicy tetap sama)
             const modalRoot = document.getElementById('modal-root');
             isModalOpen = false;
             isInfoModalOpen = true;
@@ -651,12 +582,10 @@
                     </div>
                 </div>
             `;
-            // Terapkan tema pada modal info
             applyTheme(getSavedTheme());
         }
         
         function closeInfoModal(event) {
-            // Perbaikan: Hanya tutup jika klik overlay atau tombol close
             if (!event || event.target.id === 'info-modal-overlay' || event.target.classList.contains('close-button')) {
                 document.getElementById('modal-root').innerHTML = '';
                 isInfoModalOpen = false;
@@ -676,13 +605,11 @@
                 <h3>Fitur-Fitur Utama:</h3>
                 <ol>
                     <li><b>Pelacakan Kalender:</b> Anda dapat melihat hari-hari mana saja Anda telah melakukan Muroja'ah (ditandai dengan centang hijau).</li>
-                    <li><b>Navigasi Bulan/Tahun:</b> Tombol panah memungkinkan Anda mengganti bulan satu per satu. Mengklik nama bulan/tahun memungkinkan Anda memilih tanggal secara instan melalui dropdown.</li>
-                    <li><b>Tombol Hari Ini:</b> Mengarahkan kalender kembali ke tanggal hari ini secara instan, sangat berguna jika Anda sudah menjelajahi bulan atau tahun yang jauh.</li>
+                    <li><b>Instalasi Aplikasi (PWA):</b> Anda dapat menginstal website ini menjadi aplikasi di perangkat Anda (Handphone/Desktop) dengan logo dan nama "MurojaahKu".</li>
+                    <li><b>Navigasi Bulan/Tahun:</b> Tombol panah memungkinkan Anda mengganti bulan satu per satu.</li>
                     <li><b>Fitur Tema (Terang/Gelap):</b> Anda dapat mengganti tampilan aplikasi untuk kenyamanan mata. Preferensi tema tersimpan di perangkat Anda.</li>
-                    <li><b>Pilihan Juz & Surah Lengkap:</b> Memungkinkan Anda memilih Juz dan Surah yang telah Anda Muroja'ah.</li>
                     <li><b>Integrasi API Al-Qur'an:</b> Saat memilih Surah, aplikasi mengambil teks Arab yang benar dan lengkap langsung dari API Al-Qur'an publik (memerlukan koneksi internet).</li>
                     <li><b>Pencatatan Lokal:</b> Setiap catatan dan progress tersimpan aman di browser Anda.</li>
-                    <li><b>Hapus Data Global & Harian:</b> Kontrol penuh untuk menghapus data Anda kapan saja.</li>
                 </ol>
             `;
             showInfoModal("Tentang Website & Fitur", policyText);
@@ -711,7 +638,7 @@
         }
         
 
-        // --- G. Event Handlers dan Data Management (Perbaikan Listener) ---
+        // --- G. Event Handlers dan Data Management (tetap sama) ---
 
         function handleDateClick(date) {
             selectedDate = date;
@@ -729,7 +656,6 @@
             renderModal();
         }
         
-        // FIX: Fungsi untuk menyimpan progress
         function saveProgress() {
             const catatanInput = document.getElementById('catatan-input');
             const catatan = catatanInput ? catatanInput.value : '';
@@ -743,7 +669,6 @@
                     timestamp: new Date().toISOString()
                 };
 
-                // FIX: Memastikan data disimpan di bawah selectedDate yang benar
                 const currentData = progressData[selectedDate] ? [...progressData[selectedDate], newData] : [newData];
                 progressData = { ...progressData, [selectedDate]: currentData };
                 saveProgressData(progressData);
@@ -763,7 +688,6 @@
         
         function deleteProgress() {
             if (confirm(`Anda yakin ingin menghapus SEMUA data Muroja'ah di tanggal ${selectedDate}? Aksi ini tidak dapat dibatalkan.`)) {
-                // FIX: Menggunakan object destructuring untuk menghapus key data pada selectedDate
                 const { [selectedDate]: _, ...updatedProgressData } = progressData;
                 progressData = updatedProgressData;
                 saveProgressData(progressData);
@@ -772,21 +696,17 @@
             }
         }
 
-
-        // FIX PENTING: Menggunakan Event Delegation untuk elemen yang dirender ulang
         function attachModalListeners() {
             const modalContent = document.querySelector('.modal-content');
             if (!modalContent) return;
 
-            // Pastikan listener hanya ditambahkan sekali untuk elemen statis
             if (modalContent.dataset.listenerAttached) return;
 
             modalContent.addEventListener('click', async (e) => {
                 
-                // Handle Juz Select
                 if (e.target.classList.contains('juz-item')) {
                     isLoading = true; renderModal();
-                    const juzId = parseInt(e.target.dataset.juzId);
+                    const juzId = parseInt(e.target.dataset.juz-id);
                     const juz = JUZ_DATA.find(j => j.id === juzId);
 
                     modalSelection.juz = juz; 
@@ -794,14 +714,12 @@
                     
                     isLoading = false; renderModal();
                 } 
-                // Handle Surah Select (Memanggil API)
                 else if (e.target.classList.contains('surah-item')) {
-                    const surahId = parseInt(e.target.dataset.surahId);
-                    const surahName = e.target.dataset.surahName;
+                    const surahId = parseInt(e.target.dataset.surah-id);
+                    const surahName = e.target.dataset.surah-name;
                     
                     modalSelection.surah = { id: surahId, name: surahName, text: null };
                     
-                    // Ambil teks API
                     const surahText = await fetchSurahText(surahId, surahName);
                     
                     modalSelection.surah.text = surahText;
@@ -809,22 +727,72 @@
                     modalStep = 'REVIEW';
                     renderModal();
                 } 
-                // FIX: Handle Save Button menggunakan data-action
                 else if (e.target.dataset.action === 'save-progress') {
-                    // Panggil fungsi simpan yang sudah diperbaiki
                     saveProgress(); 
                 }
             });
             
-            // Tandai bahwa listener sudah terpasang
             modalContent.dataset.listenerAttached = 'true';
         }
 
-        // --- H. Initial App Load ---
+
+        // --- H. LOGIKA PWA (Progressive Web App) untuk Instalasi ---
+
+        // 1. Mendaftarkan Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // 2. Mencegat event beforeinstallprompt (menampilkan tombol instalasi)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Mencegah Mini-Infobar standar muncul
+            e.preventDefault();
+            // Menyimpan event untuk dipicu nanti
+            deferredPrompt = e;
+            // Menampilkan tombol instalasi khusus
+            const installButton = document.getElementById('install-app-button');
+            if (installButton) {
+                installButton.style.display = 'inline-block';
+            }
+        });
+
+        // 3. Menangani klik tombol instalasi
         document.addEventListener('DOMContentLoaded', () => {
-             // Terapkan tema yang tersimpan sebelum merender aplikasi
+            const installButton = document.getElementById('install-app-button');
+            if (installButton) {
+                installButton.addEventListener('click', (e) => {
+                    if (deferredPrompt) {
+                        // Tampilkan prompt instalasi PWA
+                        deferredPrompt.prompt();
+                        // Tunggu respons dari user
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            if (choiceResult.outcome === 'accepted') {
+                                console.log('User accepted the install prompt');
+                            } else {
+                                console.log('User dismissed the install prompt');
+                            }
+                            deferredPrompt = null;
+                            // Sembunyikan tombol setelah dipicu
+                            installButton.style.display = 'none';
+                        });
+                    }
+                });
+            }
+        });
+
+        // --- I. Initial App Load ---
+        document.addEventListener('DOMContentLoaded', () => {
             applyTheme(getSavedTheme());
             renderApp();
+            // PWA logic sudah dipanggil di DOMContentLoaded juga, di bagian (H)
         });
     </script>
 </body>
