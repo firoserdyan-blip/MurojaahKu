@@ -3,274 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muroja'ahKu Tracker</title>
+    <title>Muroja'ahKu Tracker API</title>
     
     <style>
-        body {
-            background-color: #f4f4f4; 
-            margin: 0;
-            padding: 0;
-            font-family: sans-serif;
-        }
-
-        .app-container {
-            padding: 20px;
-            max-width: 800px;
-            margin: 30px auto; 
-            border: 4px solid #4CAF50; 
-            border-radius: 12px;       
-            background-color: white;   
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-            overflow: hidden; 
-        }
-
-        .main-header {
-            text-align: center;
-            color: #4CAF50; 
-            font-size: 2.5em;
-            margin-top: 0;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-        }
-
-        h1 {
-            color: #333;
-            font-size: 1.5em;
-            margin-top: 0;
-        }
-
-        /* --- Navigasi Kalender (Bulan/Tahun) --- */
-        .calendar-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 8px;
-        }
+        /* CSS umum (sedikit penyesuaian untuk tampilan loading) */
+        body { background-color: #f4f4f4; margin: 0; padding: 0; font-family: sans-serif; }
+        .app-container { padding: 20px; max-width: 800px; margin: 30px auto; border: 4px solid #4CAF50; border-radius: 12px; background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .main-header { text-align: center; color: #4CAF50; font-size: 2.5em; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; }
+        h1 { color: #333; font-size: 1.5em; margin-top: 0; }
         
-        .calendar-nav-controls {
-            display: flex;
-            gap: 10px;
-        }
+        /* Modal & Scrolling FIX */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; max-height: 90vh; overflow-y: auto; width: 90%; max-width: 800px; }
         
-        .nav-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.2em;
-            transition: background-color 0.2s;
-        }
-        
-        .nav-button:hover {
-            background-color: #0056b3;
-        }
-        
-        .month-display {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #333;
-        }
+        /* Loading Spinner */
+        .loading-spinner { border: 4px solid #f3f3f3; border-top: 4px solid #4CAF50; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- Kalender Grid --- */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr); 
-            gap: 5px; 
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            background-color: #ffffff; 
-        }
-        
-        .day-label {
-            text-align: center;
-            font-weight: bold;
-            color: #6c757d;
-            padding: 5px 0;
-            font-size: 0.8em;
-        }
-
-        .calendar-day {
-            background-color: #f0f0f0;
-            padding: 10px 5px; 
-            text-align: center;
-            border-radius: 5px;
-            cursor: pointer;
-            position: relative;
-            min-height: 40px; 
-            display: flex; 
-            justify-content: center;
-            align-items: center;
-            font-size: 0.9em; 
-            transition: background-color 0.2s;
-        }
-
-        .calendar-day:hover {
-            background-color: #e0e0e0;
-        }
-
-        .calendar-day.today {
-            border: 2px solid #007bff;
-            font-weight: bold;
-        }
-
-        .calendar-day.has-data {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .calendar-day.disabled {
-            background-color: #fff;
-            cursor: default;
-            color: #ccc;
-            border: none;
-        }
-
-        .indicator {
-            position: absolute; 
-            top: 2px; 
-            right: 2px; 
-            color: green;
-            font-size: 0.9em;
-        }
-
-        /* --- Tombol Aksi di Bawah Kalender --- */
-        .app-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            margin-top: 20px;
-        }
-        
-        .delete-all-button {
-            background-color: #dc3545; 
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            font-weight: bold;
-        }
-
-        .delete-all-button:hover {
-            background-color: #c82333;
-        }
-        
-        .privacy-button {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .privacy-button:hover {
-            background-color: #5a6268;
-        }
-
-        /* --- Modal (Pop-up) Umum dan Progress --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            max-height: 90vh; /* Memastikan modal bisa di-scroll pada layar kecil */
-            overflow-y: auto;
-        }
-
-        .large-modal {
-            width: 90%;
-            max-width: 800px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .close-button {
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-        }
-        
-        /* REVISI CSS: Untuk Scroll Juz dan Surah */
-        .juz-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 10px; 
-            margin-top: 15px;
-            max-height: 300px; /* Batasi tinggi grid Juz */
-            overflow-y: auto; /* Aktifkan scroll pada grid Juz */
-            padding-right: 10px; /* Beri ruang untuk scrollbar */
-        }
-        
-        .surah-list { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-            max-height: 400px; /* Batasi tinggi list Surah */
-            overflow-y: auto; /* Aktifkan scroll pada list Surah */
-            padding-right: 10px; /* Beri ruang untuk scrollbar */
-        }
-        
-        /* REVISI CSS: Teks Surah Display */
+        /* Scrolling containers */
+        .juz-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; max-height: 300px; overflow-y: auto; padding-right: 10px; }
+        .surah-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
         .surah-text-display { 
             background-color: #f9f9f9; 
             padding: 15px; 
             border: 1px solid #ddd; 
             border-radius: 4px; 
             margin-bottom: 15px; 
-            max-height: 250px; /* Batasi tinggi tampilan teks */
-            overflow-y: auto; /* Aktifkan scroll untuk teks Surah */
+            max-height: 250px; 
+            overflow-y: auto;
         }
         
-        /* (Styling tombol, form, dan progress view lainnya tidak berubah) */
+        /* Font Arab */
+        .surah-text-display pre { 
+            white-space: pre-wrap; 
+            font-size: 1.5em; /* Lebih besar agar jelas */
+            font-family: 'Amiri', 'Traditional Arabic', 'Times New Roman', serif; 
+            text-align: right; 
+            line-height: 2.5; 
+            margin: 0; 
+        }
+        
+        /* Styling tombol (dipertahankan) */
         .juz-item, .surah-item { padding: 15px; border: 1px solid #007bff; background-color: #e9f5ff; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.2s; text-align: center; }
         .juz-item:hover, .surah-item:hover { background-color: #cce5ff; }
-        .surah-text-display pre { white-space: pre-wrap; font-size: 1.1em; font-family: 'Times New Roman', serif; text-align: right; line-height: 2.2; margin: 0; }
+        .back-button { background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+        .back-button:hover { background-color: #5a6268; }
+        .save-button { background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+        .save-button:hover { background-color: #218838; }
+
+        /* CSS Lainnya (Kalender, Navigasi) */
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background-color: #f0f0f0; padding: 10px; border-radius: 8px; }
+        .nav-button { background-color: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 1.2em; transition: background-color 0.2s; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 20px; border: 1px solid #ccc; padding: 10px; background-color: #ffffff; }
+        .day-label { text-align: center; font-weight: bold; color: #6c757d; padding: 5px 0; font-size: 0.8em; }
+        .calendar-day { background-color: #f0f0f0; padding: 10px 5px; text-align: center; border-radius: 5px; cursor: pointer; position: relative; min-height: 40px; display: flex; justify-content: center; align-items: center; font-size: 0.9em; transition: background-color 0.2s; }
+        .calendar-day.today { border: 2px solid #007bff; font-weight: bold; }
+        .calendar-day.has-data { background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .indicator { position: absolute; top: 2px; right: 2px; color: green; font-size: 0.9em; }
+        .app-controls { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #eee; margin-top: 20px; }
+        .delete-all-button { background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; font-weight: bold; }
+        .privacy-button { background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        .close-button { background: none; border: none; font-size: 1.5em; cursor: pointer; }
         .catatan-section textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         .modal-footer { display: flex; justify-content: flex-end; align-items: center; padding-top: 15px; margin-top: 10px; border-top: 1px solid #eee; }
         .review-controls-footer { display: flex; gap: 10px; }
-        .save-button { background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
-        .save-button:hover { background-color: #218838; }
-        .back-button { background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
-        .back-button:hover { background-color: #5a6268; }
+        .delete-button { background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
         .existing-progress-view { margin-top: 30px; padding: 15px; border: 1px dashed #007bff; border-radius: 5px; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <h1 class="main-header">MurojaahKu</h1> 
-        <h1>📚 Muroja'ah Tracker Lokal</h1>
+        <h1>📚 Muroja'ah Tracker Online</h1>
         
         <div id="calendar-nav-root"></div>
         <div id="calendar-root"></div>
@@ -287,6 +92,7 @@
     <script>
         // --- A. Hook/Fungsi: Manajemen Local Storage & State ---
         const LOCAL_STORAGE_KEY = 'quranProgressVanilla';
+        // ... (Fungsi getProgressData, saveProgressData, dll. tidak berubah)
         const DAYS_OF_WEEK = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
         const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
@@ -314,71 +120,96 @@
         let modalStep = 'JUZ';
         let modalSelection = { juz: null, surah: null, catatan: '' };
         let isLoading = false;
-        
         let currentYear = new Date().getFullYear();
         let currentMonth = new Date().getMonth(); 
 
-        // --- B. API Mock (Data Dummy Ditingkatkan) ---
-        
-        // Data Juz (30 Juz)
-        const juzData = Array.from({ length: 30 }, (_, i) => {
-            const juzId = i + 1;
-            return {
-                id: juzId,
-                name: `Juz ${juzId}: ${juzId === 1 ? 'Alif Lam Mim' : juzId === 2 ? 'Sayaqul' : `Kelompok ${juzId}`}`
-            };
-        });
 
-        // Data Surah (Simulasi 5 Surah per Juz untuk menunjukkan scroll)
-        const surahData = [
-            { id: 1, juz: 1, name_id: "Al-Fatihah", verses: 7 },
-            { id: 2, juz: 1, name_id: "Al-Baqarah", verses: 286 },
-            { id: 3, juz: 1, name_id: "Ali 'Imran", verses: 200 },
-            { id: 4, juz: 1, name_id: "An-Nisa", verses: 176 },
-            { id: 5, juz: 1, name_id: "Al-Ma'idah", verses: 120 },
-        ];
-        // Tambahkan dummy surah untuk juz lain agar Juz 2 dan 3 dst. tidak kosong
-        for(let j = 2; j <= 30; j++) {
-             for(let k = 1; k <= 5; k++) {
-                surahData.push({
-                    id: surahData.length + 1, 
-                    juz: j, 
-                    name_id: `Surah Juz ${j} - ${k}`, 
-                    verses: 50 + k 
-                });
-             }
-        }
+        // --- B. DATA MOCK (Untuk mapping Juz ke Surah) ---
+        // Data ini diambil dari sumber Al-Qur'an terpercaya. Ini tetap hardcode 
+        // karena API yang berbeda mungkin mengembalikan format Juz yang berbeda.
         
-        const fetchJuzList = () => Promise.resolve(juzData);
+        const JUZ_DATA = [
+            { id: 1, name: "Juz 1: Alif Lam Mim", surahs: [{ id: 1, name: "Al-Fatihah", verses: 7 }, { id: 2, name: "Al-Baqarah (1-141)", verses: 141 }] },
+            { id: 2, name: "Juz 2: Sayaqul", surahs: [{ id: 2, name: "Al-Baqarah (142-252)", verses: 111 }] },
+            { id: 3, name: "Juz 3: Tilka-r-Rusul", surahs: [{ id: 2, name: "Al-Baqarah (253-286)", verses: 34 }, { id: 3, name: "Ali 'Imran (1-92)", verses: 92 }] },
+            { id: 4, name: "Juz 4: Lan Tanaalu", surahs: [{ id: 3, name: "Ali 'Imran (93-200)", verses: 108 }, { id: 4, name: "An-Nisa (1-23)", verses: 23 }] },
+            { id: 5, name: "Juz 5: Wal Muhshanat", surahs: [{ id: 4, name: "An-Nisa (24-147)", verses: 124 }] },
+            { id: 6, name: "Juz 6: La Yuhibbu Allah", surahs: [{ id: 4, name: "An-Nisa (148-176)", verses: 29 }, { id: 5, name: "Al-Ma'idah (1-82)", verses: 82 }] },
+            { id: 7, name: "Juz 7: Wa 'Idzaa Sami'u", surahs: [{ id: 5, name: "Al-Ma'idah (83-120)", verses: 38 }, { id: 6, name: "Al-An'am (1-110)", verses: 110 }] },
+            { id: 8, name: "Juz 8: Wa Lau Annanaa", surahs: [{ id: 6, name: "Al-An'am (111-165)", verses: 55 }, { id: 7, name: "Al-A'raf (1-87)", verses: 87 }] },
+            { id: 9, name: "Juz 9: Qalal Mala'u", surahs: [{ id: 7, name: "Al-A'raf (88-206)", verses: 119 }, { id: 8, name: "Al-Anfal", verses: 75 }] },
+            { id: 10, name: "Juz 10: Wa 'Aylamu", surahs: [{ id: 9, name: "At-Taubah (1-93)", verses: 93 }] },
+            { id: 11, name: "Juz 11: Ya'tadiruna", surahs: [{ id: 9, name: "At-Taubah (94-129)", verses: 36 }, { id: 10, name: "Yunus", verses: 109 }, { id: 11, name: "Hud (1-5)", verses: 5 }] },
+            { id: 12, name: "Juz 12: Wa Maa Min Daabbatin", surahs: [{ id: 11, name: "Hud (6-123)", verses: 118 }, { id: 12, name: "Yusuf (1-52)", verses: 52 }] },
+            { id: 13, name: "Juz 13: Wa Maa Ubarri'u", surahs: [{ id: 12, name: "Yusuf (53-111)", verses: 59 }, { id: 13, name: "Ar-Ra'd", verses: 43 }, { id: 14, name: "Ibrahim", verses: 52 }] },
+            { id: 14, name: "Juz 14: Rubama", surahs: [{ id: 15, name: "Al-Hijr", verses: 99 }, { id: 16, name: "An-Nahl (1-128)", verses: 128 }] },
+            { id: 15, name: "Juz 15: Subhanalladzi", surahs: [{ id: 17, name: "Al-Isra", verses: 111 }, { id: 18, name: "Al-Kahf (1-74)", verses: 74 }] },
+            { id: 16, name: "Juz 16: Qala Alam", surahs: [{ id: 18, name: "Al-Kahf (75-110)", verses: 36 }, { id: 19, name: "Maryam", verses: 98 }, { id: 20, name: "Taha (1-135)", verses: 135 }] },
+            { id: 17, name: "Juz 17: Iqtaraba Li-n-Nasi", surahs: [{ id: 21, name: "Al-Anbiya", verses: 112 }, { id: 22, name: "Al-Hajj", verses: 78 }] },
+            { id: 18, name: "Juz 18: Qad Aflaha", surahs: [{ id: 23, name: "Al-Mu'minun", verses: 118 }, { id: 24, name: "An-Nur", verses: 64 }, { id: 25, name: "Al-Furqan (1-20)", verses: 20 }] },
+            { id: 19, name: "Juz 19: Wa Ma Liya", surahs: [{ id: 25, name: "Al-Furqan (21-77)", verses: 57 }, { id: 26, name: "Asy-Syu'ara", verses: 227 }, { id: 27, name: "An-Naml (1-55)", verses: 55 }] },
+            { id: 20, name: "Juz 20: A'man Khalaqa", surahs: [{ id: 27, name: "An-Naml (56-93)", verses: 38 }, { id: 28, name: "Al-Qasas (1-88)", verses: 88 }, { id: 29, name: "Al-Ankabut (1-45)", verses: 45 }] },
+            { id: 21, name: "Juz 21: Utlu Ma Uhiya", surahs: [{ id: 29, name: "Al-Ankabut (46-69)", verses: 24 }, { id: 30, name: "Ar-Rum", verses: 60 }, { id: 31, name: "Luqman", verses: 34 }, { id: 32, name: "As-Sajdah", verses: 30 }, { id: 33, name: "Al-Ahzab (1-30)", verses: 30 }] },
+            { id: 22, name: "Juz 22: Wa Man Yaqnut", surahs: [{ id: 33, name: "Al-Ahzab (31-73)", verses: 43 }, { id: 34, name: "Saba", verses: 54 }, { id: 35, name: "Fatir", verses: 45 }, { id: 36, name: "Yasin (1-21)", verses: 21 }] },
+            { id: 23, name: "Juz 23: Wa Maa Lakum", surahs: [{ id: 36, name: "Yasin (22-83)", verses: 62 }, { id: 37, name: "As-Saffat", verses: 182 }, { id: 38, name: "Sad", verses: 88 }, { id: 39, name: "Az-Zumar (1-31)", verses: 31 }] },
+            { id: 24, name: "Juz 24: Faman Azlamu", surahs: [{ id: 39, name: "Az-Zumar (32-75)", verses: 44 }, { id: 40, name: "Ghafir", verses: 85 }, { id: 41, name: "Fussilat (1-46)", verses: 46 }] },
+            { id: 25, name: "Juz 25: Ilayhi Yuraddu", surahs: [{ id: 41, name: "Fussilat (47-54)", verses: 8 }, { id: 42, name: "Asy-Syura", verses: 53 }, { id: 43, name: "Az-Zukhruf", verses: 89 }, { id: 44, name: "Ad-Dukhan", verses: 59 }, { id: 45, name: "Al-Jasiyah", verses: 37 }] },
+            { id: 26, name: "Juz 26: Ha Mim", surahs: [{ id: 46, name: "Al-Ahqaf", verses: 35 }, { id: 47, name: "Muhammad", verses: 38 }, { id: 48, name: "Al-Fath", verses: 29 }, { id: 49, name: "Al-Hujurat", verses: 18 }, { id: 50, name: "Qaf", verses: 45 }, { id: 51, name: "Adz-Dzariyat (1-30)", verses: 30 }] },
+            { id: 27, name: "Juz 27: Qala Fama Khatbukum", surahs: [{ id: 51, name: "Adz-Dzariyat (31-60)", verses: 30 }, { id: 52, name: "At-Tur", verses: 49 }, { id: 53, name: "An-Najm", verses: 62 }, { id: 54, name: "Al-Qamar", verses: 55 }, { id: 55, name: "Ar-Rahman", verses: 78 }, { id: 56, name: "Al-Waqi'ah", verses: 96 }, { id: 57, name: "Al-Hadid", verses: 29 }] },
+            { id: 28, name: "Juz 28: Qad Sami'a Allahu", surahs: [{ id: 58, name: "Al-Mujadilah", verses: 22 }, { id: 59, name: "Al-Hasyr", verses: 24 }, { id: 60, name: "Al-Mumtahanah", verses: 13 }, { id: 61, name: "As-Saff", verses: 14 }, { id: 62, name: "Al-Jumu'ah", verses: 11 }, { id: 63, name: "Al-Munafiqun", verses: 11 }, { id: 64, name: "At-Taghabun", verses: 18 }, { id: 65, name: "At-Talaq", verses: 12 }, { id: 66, name: "At-Tahrim", verses: 12 }] },
+            { id: 29, name: "Juz 29: Tabarakalladzi", surahs: [{ id: 67, name: "Al-Mulk", verses: 30 }, { id: 68, name: "Al-Qalam", verses: 52 }, { id: 69, name: "Al-Haqqah", verses: 52 }, { id: 70, name: "Al-Ma'arij", verses: 44 }, { id: 71, name: "Nuh", verses: 28 }, { id: 72, name: "Al-Jinn", verses: 28 }, { id: 73, name: "Al-Muzammil", verses: 20 }, { id: 74, name: "Al-Muddassir", verses: 56 }, { id: 75, name: "Al-Qiyamah", verses: 40 }, { id: 76, name: "Al-Insan", verses: 31 }, { id: 77, name: "Al-Mursalat", verses: 50 }] },
+            { id: 30, name: "Juz 30: Amma Yatasa'alun", surahs: [{ id: 78, name: "An-Naba", verses: 40 }, { id: 79, name: "An-Naziat", verses: 46 }, { id: 80, name: "Abasa", verses: 42 }, { id: 81, name: "At-Takwir", verses: 29 }, { id: 82, name: "Al-Infitar", verses: 19 }, { id: 83, name: "Al-Mutaffifin", verses: 36 }, { id: 84, name: "Al-Insyiqaq", verses: 25 }, { id: 85, name: "Al-Buruj", verses: 22 }, { id: 86, name: "At-Tariq", verses: 17 }, { id: 87, name: "Al-A'la", verses: 19 }, { id: 88, name: "Al-Ghasyiyah", verses: 26 }, { id: 89, name: "Al-Fajr", verses: 30 }, { id: 90, name: "Al-Balad", verses: 20 }, { id: 91, name: "Asy-Syams", verses: 15 }, { id: 92, name: "Al-Lail", verses: 21 }, { id: 93, name: "Ad-Duha", verses: 11 }, { id: 94, name: "Al-Insyirah", verses: 8 }, { id: 95, name: "At-Tin", verses: 8 }, { id: 96, name: "Al-Alaq", verses: 19 }, { id: 97, name: "Al-Qadr", verses: 5 }, { id: 98, name: "Al-Bayyinah", verses: 8 }, { id: 99, name: "Az-Zalzalah", verses: 8 }, { id: 100, name: "Al-Adiyat", verses: 11 }, { id: 101, name: "Al-Qari'ah", verses: 11 }, { id: 102, name: "At-Takasur", verses: 8 }, { id: 103, name: "Al-Asr", verses: 3 }, { id: 104, name: "Al-Humazah", verses: 9 }, { id: 105, name: "Al-Fil", verses: 5 }, { id: 106, name: "Quraisy", verses: 4 }, { id: 107, name: "Al-Ma'un", verses: 7 }, { id: 108, name: "Al-Kausar", verses: 3 }, { id: 109, name: "Al-Kafirun", verses: 6 }, { id: 110, name: "An-Nasr", verses: 3 }, { id: 111, name: "Al-Lahab", verses: 5 }, { id: 112, name: "Al-Ikhlas", verses: 4 }, { id: 113, name: "Al-Falaq", verses: 5 }, { id: 114, name: "An-Nas", verses: 6 }] }
+        ];
+
+        
+        const fetchJuzList = () => Promise.resolve(JUZ_DATA);
 
         const fetchSurahsByJuz = (juzId) => {
-            const filteredSurahs = surahData.filter(surah => surah.juz === juzId);
-            return Promise.resolve(filteredSurahs);
+            const juz = JUZ_DATA.find(j => j.id === juzId);
+            return Promise.resolve(juz ? juz.surahs : []);
         };
 
-        const fetchSurahText = (surahId) => {
-            const surah = surahData.find(s => s.id === surahId);
-            const numVerses = surah ? surah.verses : 10;
+        const fetchSurahText = async (surahId, surahName) => {
+            // **PERHATIAN: INI ADALAH BAGIAN KRUSIAL!**
+            // Di sini, kita akan mencoba memanggil API nyata untuk mendapatkan data lengkap.
             
-            // Teks Dummy yang Panjang agar Scroll Aktif
-            let longText = `
-                بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ.
+            // Contoh URL API Publik (Quran-API):
+            const API_URL = `https://api.alquran.cloud/v1/surah/${surahId}/ar.uthmani`;
+            
+            try {
+                // Tampilkan loading sebelum fetch
+                isLoading = true; renderModal();
                 
-                {Teks Ayat 1: Ini adalah teks yang panjang agar tampilan scroll aktif.}
-                {Teks Ayat 2: Baris kedua untuk mengisi ruang dan memastikan konten melimpah.}
-                {Teks Ayat 3: Baris ketiga. ${surah ? surah.name_id : ''} dimulai.}
-            `;
-            
-            for (let i = 4; i <= numVerses; i++) {
-                longText += `\n{Teks Ayat ${i}: Isi dummy untuk ${surah ? surah.name_id : 'Surah'} Ayat ${i}.}`;
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`Gagal mengambil data dari API (Status: ${response.status}).`);
+                }
+                const data = await response.json();
+                
+                // Proses data untuk format tampilan
+                let surahText = `بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\n\n`;
+                
+                if (data.data && data.data.ayahs) {
+                    data.data.ayahs.forEach(ayah => {
+                        // Gabungkan teks Arab dan nomor Ayat
+                        surahText += `${ayah.text} ﴿${ayah.numberInSurah}﴾\n\n`;
+                    });
+                } else {
+                    surahText = `Data Ayat tidak ditemukan untuk ${surahName} (${surahId}).`;
+                }
+
+                return surahText;
+            } catch (error) {
+                console.error("Kesalahan Fetch API:", error);
+                // Kembalikan pesan kesalahan yang jelas kepada pengguna
+                return `[ERROR DATA API] Gagal memuat konten Al-Qur'an untuk Surah ${surahName}.\nSilakan coba lagi atau pastikan perangkat Anda terhubung ke internet. \n\nDetail: ${error.message}`;
+            } finally {
+                // Sembunyikan loading setelah selesai (baik sukses maupun gagal)
+                isLoading = false; 
             }
-            
-            longText += `\n\n... Selesai: ${surah ? surah.name_id : 'Surah'} memiliki ${numVerses} Ayat.`;
-            
-            return Promise.resolve(longText);
         };
 
-        // --- C. Fungsi Render Kalender dan Navigasi ---
+        // --- C. Fungsi Render Kalender dan Navigasi (Dipotong agar fokus pada perbaikan) ---
         
         function renderCalendarNav() {
             const navRoot = document.getElementById('calendar-nav-root');
@@ -419,7 +250,7 @@
                 label.className = 'day-label';
                 label.textContent = day;
                 calendarGrid.appendChild(label);
-            });
+           });
 
             for (let i = 0; i < firstDayOfMonth; i++) {
                 const emptyDiv = document.createElement('div');
@@ -454,7 +285,7 @@
             root.appendChild(calendarGrid);
         }
 
-        // --- D. Fungsi Modal dan Logic ---
+        // --- D. Fungsi Modal dan Logic (Revisi untuk API dan Loading) ---
         
         async function renderModal() {
             const root = document.getElementById('modal-root');
@@ -466,25 +297,44 @@
             let contentHTML = '';
             let currentData = progressData[selectedDate] || [];
 
-            if (isLoading) { contentHTML = `<p>Memuat data Al-Qur'an...</p>`; } 
+            if (isLoading && modalStep !== 'REVIEW') { 
+                contentHTML = `<p>Memuat daftar Surah...</p><div class="loading-spinner"></div>`; 
+            } else if (isLoading && modalStep === 'REVIEW') {
+                 contentHTML = `<p>Memuat teks Al-Qur'an dari API...</p><div class="loading-spinner"></div>`;
+            }
             else if (modalStep === 'JUZ') {
                 let juzListHTML = '';
                 const list = await fetchJuzList();
-                list.forEach(juz => { juzListHTML += `<button class="juz-item" data-juz-id="${juz.id}" data-juz-name="${juz.name}">${juz.name}</button>`; });
-                // KONTEN JUZ SEKARANG BISA DI-SCROLL BERKAT CSS: .juz-grid { overflow-y: auto; max-height: 300px; }
+                list.forEach(juz => { 
+                    // Tampilan Juz: Juz X: Nama Awal
+                    const buttonText = juz.name; 
+                    juzListHTML += `<button class="juz-item" data-juz-id="${juz.id}" data-juz-name="${juz.name}">${buttonText}</button>`; 
+                });
+                
                 contentHTML = `<h3>Pilih Juz untuk Muroja'ah (Scroll untuk melihat 30 Juz)</h3><div class="juz-grid">${juzListHTML}</div>`;
             } 
             else if (modalStep === 'SURAH') {
                 let surahListHTML = '';
-                const list = await fetchSurahsByJuz(modalSelection.juz.id);
-                list.forEach(surah => { surahListHTML += `<button class="surah-item" data-surah-id="${surah.id}" data-surah-name="${surah.name_id}">${surah.name_id} (${surah.verses} Ayat)</button>`; });
-                // KONTEN SURAH SEKARANG BISA DI-SCROLL BERKAT CSS: .surah-list { overflow-y: auto; max-height: 400px; }
+                // Mengambil surah berdasarkan Juz yang sudah dipilih sebelumnya
+                const list = modalSelection.juz.surahs; 
+                
+                if (list && list.length === 0) {
+                     surahListHTML = `<p>Tidak ada data surah di Juz ini.</p>`;
+                } else {
+                     list.forEach(surah => { 
+                         // Simpan nomor Surah (id) dari API dan nama Surah (name)
+                         surahListHTML += `<button class="surah-item" data-surah-id="${surah.id}" data-surah-name="${surah.name}">${surah.name} (${surah.verses} Ayat)</button>`; 
+                     });
+                }
+                
                 contentHTML = `<h3>Pilih Surah di ${modalSelection.juz.name} (Scroll jika banyak)</h3><button class="back-button" onclick="setStep('JUZ')">Pilih Juz Lain</button><div class="surah-list">${surahListHTML}</div>`;
             } 
             else if (modalStep === 'REVIEW') {
-                const surahText = await fetchSurahText(modalSelection.surah.id);
+                // Konten API sudah diambil di handler, simpan di modalSelection.surah.text
+                const surahText = modalSelection.surah.text || "Gagal memuat teks Al-Qur'an.";
                 contentHTML = `
-                    <h3>Catatan Muroja'ah: ${modalSelection.surah.name_id}</h3>
+                    <h3>Catatan Muroja'ah: ${modalSelection.surah.name}</h3>
+                    <p>Konten di bawah diambil langsung dari API Al-Qur'an:</p>
                     <div class="surah-text-display"><pre>${surahText}</pre></div><hr/>
                     <div class="catatan-section"><h4>Catatan Anda:</h4>
                         <textarea id="catatan-input" placeholder="Tulis catatan di sini" rows="5">${modalSelection.catatan}</textarea>
@@ -511,7 +361,6 @@
                 </div>`;
             }
             
-            // Perbaikan: Tombol Hapus per tanggal hanya di tampilkan jika bukan di step REVIEW
             const footerHTML = `
                 <div class="modal-footer">
                     ${modalStep !== 'REVIEW' ? deleteButtonPerDateHTML : ''}
@@ -536,23 +385,101 @@
             root.innerHTML = modalHTML;
             attachModalListeners();
         }
-
-        function renderProgressView() {
-            const root = document.getElementById('progress-view-root');
-            if (isModalOpen || !selectedDate) {
-                root.innerHTML = '';
-                return;
-            }
-        }
         
         function renderApp() {
             renderCalendarNav();
             renderCalendar();
             renderModal();
-            renderProgressView();
         }
 
-        // --- E. Logic Hapus Data dan Privacy Policy ---
+
+        // --- E. Event Handlers dan State Updater (Modifikasi untuk API) ---
+
+        function handleDateClick(date) {
+            selectedDate = date;
+            isModalOpen = true;
+            modalStep = 'JUZ';
+            modalSelection = { juz: null, surah: null, catatan: '' };
+            renderApp();
+        }
+
+        function closeModal() {
+            isModalOpen = false;
+            selectedDate = '';
+            renderApp();
+        }
+
+        function setStep(step) {
+            modalStep = step;
+            // Bersihkan teks API jika kembali dari REVIEW
+            if (step !== 'REVIEW' && modalSelection.surah) {
+                modalSelection.surah.text = null; 
+            }
+            renderModal();
+        }
+
+        function saveProgress() {
+            const catatanInput = document.getElementById('catatan-input');
+            const catatan = catatanInput ? catatanInput.value : '';
+
+            if (modalSelection.surah) {
+                const newData = {
+                    juzId: modalSelection.juz.id,
+                    surahId: modalSelection.surah.id,
+                    surahName: modalSelection.surah.name, // Gunakan modalSelection.surah.name
+                    catatan: catatan,
+                    timestamp: new Date().toISOString()
+                };
+
+                const currentData = progressData[selectedDate] ? [...progressData[selectedDate], newData] : [newData];
+                progressData = { ...progressData, [selectedDate]: currentData };
+                saveProgressData(progressData);
+                
+                closeModal();
+            }
+        }
+
+        function attachModalListeners() {
+            const modalContent = document.querySelector('.modal-overlay');
+            if (!modalContent) return;
+
+            modalContent.addEventListener('click', async (e) => {
+                // Handle Juz Select
+                if (e.target.classList.contains('juz-item')) {
+                    isLoading = true; renderModal();
+                    const juzId = parseInt(e.target.dataset.juzId);
+                    const juz = JUZ_DATA.find(j => j.id === juzId);
+
+                    modalSelection.juz = juz; 
+                    modalStep = 'SURAH';
+                    
+                    isLoading = false; renderModal();
+                } 
+                // Handle Surah Select (Memanggil API)
+                else if (e.target.classList.contains('surah-item')) {
+                    const surahId = parseInt(e.target.dataset.surahId);
+                    const surahName = e.target.dataset.surahName;
+                    
+                    // Simpan sementara data surah
+                    modalSelection.surah = { id: surahId, name: surahName, text: null };
+                    
+                    // Panggil API untuk mendapatkan teks
+                    const surahText = await fetchSurahText(surahId, surahName);
+                    
+                    // Simpan teks yang didapat dari API
+                    modalSelection.surah.text = surahText;
+                    
+                    modalStep = 'REVIEW';
+                    renderModal();
+                } 
+                // Handle Save Button
+                else if (e.target.id === 'save-progress-btn') {
+                    saveProgress();
+                }
+            });
+        }
+        
+        // --- F. Logic Hapus Data dan Privacy Policy (Tidak Berubah) ---
 
         function deleteAllData() {
             if (confirm("PERINGATAN! Anda yakin ingin menghapus SELURUH data Muroja'ah yang tersimpan? Aksi ini tidak dapat dibatalkan.")) {
@@ -576,14 +503,17 @@
         function showPrivacyPolicy() {
             const policyText = `
                 <h2>Kebijakan Privasi Muroja'ahKu</h2>
-                <p>Aplikasi ini dibuat murni untuk membantu Anda melacak Muroja'ah Anda.</p>
+                <p>Aplikasi ini sekarang menggunakan API Al-Qur'an online untuk menampilkan teks Arab yang benar.</p>
                 <p><b>Privasi Data (Local Storage):</b></p>
                 <ul>
-                    <li>Semua data progress dan catatan yang Anda masukkan <b>hanya tersimpan di browser perangkat Anda sendiri</b> (Local Storage).</li>
-                    <li>Aplikasi <b>TIDAK mengumpulkan, mengirim, atau menyimpan data Anda di server eksternal</b> manapun.</li>
-                    <li>Kami tidak memiliki akses ke data Anda. Jika Anda menghapus cache browser, data Anda akan hilang.</li>
+                    <li>Semua data progress dan catatan Anda **hanya tersimpan di browser perangkat Anda sendiri** (Local Storage).</li>
+                    <li>Kami **TIDAK MEREKAM** progress Anda di server kami.</li>
                 </ul>
-                <p>Terima kasih telah menggunakan Muroja'ahKu.</p>
+                <p><b>Koneksi API:</b></p>
+                <ul>
+                    <li>Saat Anda memilih surah, aplikasi akan **mengirim permintaan ke API Al-Qur'an** (misalnya api.alquran.cloud) untuk mengambil teks Arab.</li>
+                    <li>Koneksi internet diperlukan untuk melihat teks Al-Qur'an secara benar.</li>
+                </ul>
             `;
             
             const modalRoot = document.getElementById('modal-root');
@@ -604,74 +534,6 @@
             if (!event || event.target.classList.contains('modal-overlay') || event.target.classList.contains('close-button')) {
                 document.getElementById('modal-root').innerHTML = '';
             }
-        }
-
-        // --- F. Event Handlers dan State Updater ---
-
-        function handleDateClick(date) {
-            selectedDate = date;
-            isModalOpen = true;
-            modalStep = 'JUZ';
-            modalSelection = { juz: null, surah: null, catatan: '' };
-            renderApp();
-        }
-
-        function closeModal() {
-            isModalOpen = false;
-            selectedDate = '';
-            renderApp();
-        }
-
-        function setStep(step) {
-            modalStep = step;
-            renderModal();
-        }
-
-        function saveProgress() {
-            const catatanInput = document.getElementById('catatan-input');
-            const catatan = catatanInput ? catatanInput.value : '';
-
-            if (modalSelection.surah) {
-                const newData = {
-                    juzId: modalSelection.juz.id,
-                    surahId: modalSelection.surah.id,
-                    surahName: modalSelection.surah.name_id,
-                    catatan: catatan,
-                    timestamp: new Date().toISOString()
-                };
-
-                const currentData = progressData[selectedDate] ? [...progressData[selectedDate], newData] : [newData];
-                progressData = { ...progressData, [selectedDate]: currentData };
-                saveProgressData(progressData);
-                
-                closeModal();
-            }
-        }
-
-        function attachModalListeners() {
-            const modalContent = document.querySelector('.modal-overlay');
-            if (!modalContent) return;
-
-            modalContent.addEventListener('click', async (e) => {
-                // Handle Juz Select
-                if (e.target.classList.contains('juz-item')) {
-                    isLoading = true; renderModal();
-                    const juz = { id: parseInt(e.target.dataset.juzId), name: e.target.dataset.juzName };
-                    modalSelection.juz = juz; modalStep = 'SURAH';
-                    await fetchSurahsByJuz(juz.id); isLoading = false; renderModal();
-                } 
-                // Handle Surah Select
-                else if (e.target.classList.contains('surah-item')) {
-                    isLoading = true; renderModal();
-                    const surah = { id: parseInt(e.target.dataset.surahId), name_id: e.target.dataset.surahName };
-                    modalSelection.surah = surah; modalStep = 'REVIEW';
-                    await fetchSurahText(surah.id); isLoading = false; renderModal();
-                } 
-                // Handle Save Button
-                else if (e.target.id === 'save-progress-btn') {
-                    saveProgress();
-                }
-            });
         }
 
         // --- G. Initial App Load ---
