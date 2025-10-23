@@ -1,4 +1,4 @@
-// script.js (Vanilla JavaScript Murni)
+// script.js (Vanilla JavaScript Murni - DENGAN FITUR HAPUS DATA)
 
 // --- A. Hook/Fungsi: Manajemen Local Storage ---
 const LOCAL_STORAGE_KEY = 'quranProgressVanilla';
@@ -74,6 +74,7 @@ function renderCalendar() {
     const root = document.getElementById('calendar-root');
     root.innerHTML = '';
     
+    // Asumsi bulan ini memiliki 30 hari untuk kesederhanaan
     const daysInMonth = 30; 
     const today = new Date().toISOString().slice(0, 10);
     
@@ -81,6 +82,7 @@ function renderCalendar() {
     calendarGrid.className = 'calendar-grid';
 
     for (let i = 1; i <= daysInMonth; i++) {
+        // Membuat tanggal 'YYYY-MM-DD' untuk bulan saat ini
         const currentDate = new Date(new Date().getFullYear(), new Date().getMonth(), i)
             .toISOString().slice(0, 10);
         
@@ -165,8 +167,6 @@ async function renderModal() {
                 <h4>Catatan Anda:</h4>
                 <textarea id="catatan-input" placeholder="Tulis catatan di sini" rows="5">${modalSelection.catatan}</textarea>
             </div>
-            <button class="back-button" onclick="setStep('SURAH')">Pilih Surah Lain</button>
-            <button class="save-button" id="save-progress-btn">Simpan Catatan</button>
         `;
     }
 
@@ -174,11 +174,28 @@ async function renderModal() {
     let existingProgressHTML = '';
     if (currentData.length > 0) {
         let items = currentData.map(item => 
-            `<p>**${item.surahName}** (Juz ${item.juzId}): ${item.catatan}</p>`
+            `<p>• **${item.surahName}** (Juz ${item.juzId}): ${item.catatan}</p>`
         ).join('');
         existingProgressHTML = `<div class="existing-progress-view"><h4>Progress di ${selectedDate} sebelumnya:</h4>${items}</div>`;
     }
 
+    // Kontrol tombol di bagian bawah modal
+    let buttonControlsHTML = '';
+    if (modalStep === 'REVIEW') {
+        buttonControlsHTML = `
+            <div class="modal-controls">
+                <button class="back-button" onclick="setStep('SURAH')">Pilih Surah Lain</button>
+                <button class="save-button" id="save-progress-btn">Simpan Catatan</button>
+            </div>
+        `;
+    } else if (currentData.length > 0) {
+        // Tombol hapus hanya muncul jika ada data lama di tanggal ini
+        buttonControlsHTML = `
+            <div class="modal-controls">
+                <button class="delete-button" id="delete-progress-btn">Hapus Semua Data di Tanggal Ini</button>
+            </div>
+        `;
+    }
 
     const modalHTML = `
         <div class="modal-overlay">
@@ -191,7 +208,7 @@ async function renderModal() {
                     ${contentHTML}
                     ${existingProgressHTML}
                 </div>
-            </div>
+                ${buttonControlsHTML} </div>
         </div>
     `;
 
@@ -210,7 +227,7 @@ function renderProgressView() {
 
     if (existingProgress.length > 0) {
         let items = existingProgress.map(item => 
-            `<p>**${item.surahName}** (Juz ${item.juzId}): ${item.catatan}</p>`
+            `<p>• **${item.surahName}** (Juz ${item.juzId}): ${item.catatan}</p>`
         ).join('');
 
         const progressDiv = document.createElement('div');
@@ -264,11 +281,26 @@ function saveProgress() {
     }
 }
 
+// Fungsi BARU untuk menghapus data
+function deleteProgress() {
+    if (confirm(`Anda yakin ingin menghapus SEMUA data Muroja'ah di tanggal ${selectedDate}? Aksi ini tidak dapat dibatalkan.`)) {
+        // Buat objek baru tanpa tanggal yang dipilih
+        const { [selectedDate]: _, ...updatedProgressData } = progressData;
+        
+        progressData = updatedProgressData;
+        saveProgressData(progressData);
+        
+        // Tutup modal dan refresh tampilan
+        closeModal();
+        alert(`Data Muroja'ah di tanggal ${selectedDate} berhasil dihapus.`);
+    }
+}
+
 
 // --- F. Attach Listener untuk Modal (Event Delegation) ---
 
 function attachModalListeners() {
-    const modalContent = document.querySelector('.modal-content');
+    const modalContent = document.querySelector('.modal-overlay'); // Perhatikan, kita pasang di overlay
     if (!modalContent) return;
 
     modalContent.addEventListener('click', async (e) => {
@@ -311,6 +343,11 @@ function attachModalListeners() {
         // Handle Save Button
         else if (e.target.id === 'save-progress-btn') {
             saveProgress();
+        }
+
+        // Handle Delete Button
+        else if (e.target.id === 'delete-progress-btn') {
+            deleteProgress();
         }
     });
 }
