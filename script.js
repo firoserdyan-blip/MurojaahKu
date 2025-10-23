@@ -1,4 +1,4 @@
-// script.js (Vanilla JavaScript Murni - DENGAN FITUR HAPUS DATA)
+// script.js (Vanilla JavaScript Murni - DENGAN FITUR HAPUS DATA YANG TEPAT)
 
 // --- A. Hook/Fungsi: Manajemen Local Storage ---
 const LOCAL_STORAGE_KEY = 'quranProgressVanilla';
@@ -179,24 +179,31 @@ async function renderModal() {
         existingProgressHTML = `<div class="existing-progress-view"><h4>Progress di ${selectedDate} sebelumnya:</h4>${items}</div>`;
     }
 
-    // Kontrol tombol di bagian bawah modal
-    let buttonControlsHTML = '';
+    // --- Kontrol tombol di Modal Footer (Solusi Hapus Data) ---
+    let footerContentHTML = '';
+    
+    // 1. Tombol Save/Back (hanya visible di step REVIEW, diletakkan di sisi kanan)
     if (modalStep === 'REVIEW') {
-        buttonControlsHTML = `
-            <div class="modal-controls">
+        footerContentHTML = `
+            <div class="review-controls-footer">
                 <button class="back-button" onclick="setStep('SURAH')">Pilih Surah Lain</button>
                 <button class="save-button" id="save-progress-btn">Simpan Catatan</button>
             </div>
         `;
-    } else if (currentData.length > 0) {
-        // Tombol hapus hanya muncul jika ada data lama di tanggal ini
-        buttonControlsHTML = `
-            <div class="modal-controls">
-                <button class="delete-button" id="delete-progress-btn">Hapus Semua Data di Tanggal Ini</button>
-            </div>
-        `;
     }
 
+    // 2. Tombol Hapus (selalu tersedia jika ada data, kecuali saat proses REVIEW)
+    const deleteButtonHTML = currentData.length > 0 && modalStep !== 'REVIEW' ? 
+        `<button class="delete-button" id="delete-progress-btn">Hapus Semua Data di Tanggal Ini</button>` : '';
+
+    const footerHTML = `
+        <div class="modal-footer">
+            ${deleteButtonHTML}
+            ${footerContentHTML}
+        </div>
+    `;
+    
+    // --- Struktur Modal Akhir ---
     const modalHTML = `
         <div class="modal-overlay">
             <div class="modal-content large-modal">
@@ -208,7 +215,7 @@ async function renderModal() {
                     ${contentHTML}
                     ${existingProgressHTML}
                 </div>
-                ${buttonControlsHTML} </div>
+                ${footerHTML} </div>
         </div>
     `;
 
@@ -216,7 +223,7 @@ async function renderModal() {
     attachModalListeners();
 }
 
-// --- Render Progress View di Luar Modal ---
+// --- Render Progress View di Luar Modal (tetap sama) ---
 function renderProgressView() {
     const root = document.getElementById('progress-view-root');
     root.innerHTML = '';
@@ -239,7 +246,7 @@ function renderProgressView() {
     }
 }
 
-// --- E. Event Handlers dan State Updater ---
+// --- E. Event Handlers dan State Updater (tetap sama) ---
 
 function handleDateClick(date) {
     selectedDate = date;
@@ -281,7 +288,6 @@ function saveProgress() {
     }
 }
 
-// Fungsi BARU untuk menghapus data
 function deleteProgress() {
     if (confirm(`Anda yakin ingin menghapus SEMUA data Muroja'ah di tanggal ${selectedDate}? Aksi ini tidak dapat dibatalkan.`)) {
         // Buat objek baru tanpa tanggal yang dipilih
@@ -300,7 +306,7 @@ function deleteProgress() {
 // --- F. Attach Listener untuk Modal (Event Delegation) ---
 
 function attachModalListeners() {
-    const modalContent = document.querySelector('.modal-overlay'); // Perhatikan, kita pasang di overlay
+    const modalContent = document.querySelector('.modal-overlay');
     if (!modalContent) return;
 
     modalContent.addEventListener('click', async (e) => {
@@ -316,7 +322,6 @@ function attachModalListeners() {
             modalSelection.juz = juz;
             modalStep = 'SURAH';
             
-            // Tunggu data dimuat di renderModal
             await fetchSurahsByJuz(juz.id); 
             isLoading = false;
             renderModal();
@@ -334,7 +339,6 @@ function attachModalListeners() {
             modalSelection.surah = surah;
             modalStep = 'REVIEW';
             
-            // Tunggu data dimuat di renderModal
             await fetchSurahText(surah.id);
             isLoading = false;
             renderModal();
