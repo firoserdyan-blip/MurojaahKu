@@ -1,4 +1,4 @@
-// script.js (Vanilla JavaScript Murni - DENGAN FITUR HAPUS DATA YANG TEPAT)
+// script.js (Vanilla JavaScript Murni - DENGAN FITUR HAPUS DATA)
 
 // --- A. Hook/Fungsi: Manajemen Local Storage ---
 const LOCAL_STORAGE_KEY = 'quranProgressVanilla';
@@ -61,20 +61,17 @@ const fetchSurahText = (surahId) => {
     return Promise.resolve(dummyText);
 };
 
-// --- D. Fungsi Render (Menggantikan Komponen React) ---
-
+// --- D. Fungsi Render ---
 function renderApp() {
     renderCalendar();
     renderModal();
     renderProgressView();
 }
 
-// --- Render Kalender ---
 function renderCalendar() {
     const root = document.getElementById('calendar-root');
     root.innerHTML = '';
     
-    // Asumsi bulan ini memiliki 30 hari untuk kesederhanaan
     const daysInMonth = 30; 
     const today = new Date().toISOString().slice(0, 10);
     
@@ -82,16 +79,13 @@ function renderCalendar() {
     calendarGrid.className = 'calendar-grid';
 
     for (let i = 1; i <= daysInMonth; i++) {
-        // Membuat tanggal 'YYYY-MM-DD' untuk bulan saat ini
-        const currentDate = new Date(new Date().getFullYear(), new Date().getMonth(), i)
-            .toISOString().slice(0, 10);
+        const currentDate = new Date(new Date().getFullYear(), new Date().getMonth(), i).toISOString().slice(0, 10);
         
         const dayDiv = document.createElement('div');
         dayDiv.className = 'calendar-day';
         dayDiv.textContent = i;
         dayDiv.setAttribute('data-date', currentDate);
 
-        // Styling dan data indicator
         if (currentDate === today) {
             dayDiv.classList.add('today');
         }
@@ -103,7 +97,6 @@ function renderCalendar() {
             dayDiv.appendChild(indicator);
         }
 
-        // Event listener (Menggantikan onClick di React)
         dayDiv.addEventListener('click', () => handleDateClick(currentDate));
         
         calendarGrid.appendChild(dayDiv);
@@ -112,7 +105,6 @@ function renderCalendar() {
     root.appendChild(calendarGrid);
 }
 
-// --- Render Modal ---
 async function renderModal() {
     const root = document.getElementById('modal-root');
     if (!isModalOpen) {
@@ -123,12 +115,9 @@ async function renderModal() {
     let contentHTML = '';
     let currentData = progressData[selectedDate] || [];
 
-    // Tampilan Loading
     if (isLoading) {
         contentHTML = `<p>Memuat data Al-Qur'an...</p>`;
-    } 
-    // Tampilan Step JUZ
-    else if (modalStep === 'JUZ') {
+    } else if (modalStep === 'JUZ') {
         let juzListHTML = '';
         const list = await fetchJuzList();
         
@@ -140,9 +129,7 @@ async function renderModal() {
             <h3>Pilih Juz untuk Muroja'ah</h3>
             <div class="juz-grid">${juzListHTML}</div>
         `;
-    } 
-    // Tampilan Step SURAH
-    else if (modalStep === 'SURAH') {
+    } else if (modalStep === 'SURAH') {
         let surahListHTML = '';
         const list = await fetchSurahsByJuz(modalSelection.juz.id);
 
@@ -155,9 +142,7 @@ async function renderModal() {
             <button class="back-button" onclick="setStep('JUZ')">Pilih Juz Lain</button>
             <div class="surah-list">${surahListHTML}</div>
         `;
-    } 
-    // Tampilan Step REVIEW
-    else if (modalStep === 'REVIEW') {
+    } else if (modalStep === 'REVIEW') {
         const surahText = await fetchSurahText(modalSelection.surah.id);
         contentHTML = `
             <h3>Catatan Muroja'ah: ${modalSelection.surah.name_id}</h3>
@@ -170,7 +155,7 @@ async function renderModal() {
         `;
     }
 
-    // Tampilan Progress Lama (di modal)
+    // Tampilan Progress Lama
     let existingProgressHTML = '';
     if (currentData.length > 0) {
         let items = currentData.map(item => 
@@ -179,10 +164,10 @@ async function renderModal() {
         existingProgressHTML = `<div class="existing-progress-view"><h4>Progress di ${selectedDate} sebelumnya:</h4>${items}</div>`;
     }
 
-    // --- Kontrol tombol di Modal Footer (Solusi Hapus Data) ---
+    // Kontrol tombol di Modal Footer (Solusi Hapus Data)
     let footerContentHTML = '';
     
-    // 1. Tombol Save/Back (hanya visible di step REVIEW, diletakkan di sisi kanan)
+    // Tombol Save/Back (kanan)
     if (modalStep === 'REVIEW') {
         footerContentHTML = `
             <div class="review-controls-footer">
@@ -192,7 +177,7 @@ async function renderModal() {
         `;
     }
 
-    // 2. Tombol Hapus (selalu tersedia jika ada data, kecuali saat proses REVIEW)
+    // Tombol Hapus (kiri)
     const deleteButtonHTML = currentData.length > 0 && modalStep !== 'REVIEW' ? 
         `<button class="delete-button" id="delete-progress-btn">Hapus Semua Data di Tanggal Ini</button>` : '';
 
@@ -203,7 +188,7 @@ async function renderModal() {
         </div>
     `;
     
-    // --- Struktur Modal Akhir ---
+    // Struktur Modal Akhir
     const modalHTML = `
         <div class="modal-overlay">
             <div class="modal-content large-modal">
@@ -215,7 +200,8 @@ async function renderModal() {
                     ${contentHTML}
                     ${existingProgressHTML}
                 </div>
-                ${footerHTML} </div>
+                ${footerHTML}
+            </div>
         </div>
     `;
 
@@ -223,7 +209,6 @@ async function renderModal() {
     attachModalListeners();
 }
 
-// --- Render Progress View di Luar Modal (tetap sama) ---
 function renderProgressView() {
     const root = document.getElementById('progress-view-root');
     root.innerHTML = '';
@@ -246,7 +231,7 @@ function renderProgressView() {
     }
 }
 
-// --- E. Event Handlers dan State Updater (tetap sama) ---
+// --- E. Event Handlers dan State Updater ---
 
 function handleDateClick(date) {
     selectedDate = date;
@@ -290,13 +275,11 @@ function saveProgress() {
 
 function deleteProgress() {
     if (confirm(`Anda yakin ingin menghapus SEMUA data Muroja'ah di tanggal ${selectedDate}? Aksi ini tidak dapat dibatalkan.`)) {
-        // Buat objek baru tanpa tanggal yang dipilih
         const { [selectedDate]: _, ...updatedProgressData } = progressData;
         
         progressData = updatedProgressData;
         saveProgressData(progressData);
         
-        // Tutup modal dan refresh tampilan
         closeModal();
         alert(`Data Muroja'ah di tanggal ${selectedDate} berhasil dihapus.`);
     }
