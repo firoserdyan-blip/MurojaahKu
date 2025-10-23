@@ -1,18 +1,18 @@
-const CACHE_NAME = 'murojaahku-v1.0.1';
+const CACHE_NAME = 'murojaahku-tracker-v1.2.0'; // Ganti versi untuk memaksa update!
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/logo.png',
-  '/manifest.json',
-  // Tambahkan file CSS/JS/Aset lain yang Anda miliki
+  '/', 
+  './index.html',
+  './logo.png',
+  './manifest.json',
+  // Pastikan Anda menambahkan semua file CSS dan JS yang diperlukan di sini!
 ];
 
-// Instalasi Service Worker: Menyimpan aset statis ke cache
+// Instalasi Service Worker
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Opened cache. Caching essential assets for MurojaahKu...');
         return cache.addAll(urlsToCache);
       })
       .catch(err => {
@@ -38,21 +38,28 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch Request: Melayani konten dari cache, fallback ke jaringan
+// Fetch Request: LOGIKA PERBAIKAN 404
 self.addEventListener('fetch', event => {
-  // Hanya melayani file yang ada di cache atau index.html
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Jika ada di cache, kirimkan dari cache
         if (response) {
           return response;
         }
-        // Jika tidak, ambil dari jaringan
+
         return fetch(event.request).catch(error => {
-            // Ini akan menangani ketika offline dan file tidak ada di cache
-            // Anda bisa mengembalikan halaman offline di sini jika diperlukan
-            console.log('Fetch failed, request:', event.request.url, error);
+          
+          if (event.request.mode === 'navigate' || 
+              (event.request.destination === 'document')) {
+             
+              console.log('Navigation request failed. Serving index.html as fallback for MurojaahKu.');
+              
+              return caches.match('./index.html');
+          }
+          
+          throw error;
         });
       })
   );
