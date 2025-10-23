@@ -86,6 +86,101 @@
         }
         .install-button:hover { background-color: #45a049; }
 
+        /* --- STYLING BARU UNTUK TOMBOL AKSI APLIKASI --- */
+        
+        .app-controls { margin-top: 20px; text-align: center; }
+
+        .delete-all-button {
+            background-color: #f44336; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            font-size: 1em;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            margin-top: 15px;
+        }
+        .delete-all-button:hover {
+            background-color: #d32f2f;
+            transform: translateY(-1px);
+        }
+        .delete-all-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Gaya untuk Tombol Modal (Save, Back, Delete per Tanggal) */
+        .action-btn-primary, .action-btn-secondary, .action-btn-danger {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Tombol Simpan (Primary) */
+        .action-btn-primary {
+            background: linear-gradient(45deg, #4CAF50, #81c784);
+            color: white;
+        }
+        .action-btn-primary:hover {
+            background: linear-gradient(45deg, #45a049, #66bb6a);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Tombol Kembali/Pilih Lain (Secondary) */
+        .action-btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        .action-btn-secondary:hover {
+            background-color: #bdbdbd;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Tombol Hapus per Tanggal (Danger) */
+        .action-btn-danger {
+            background: linear-gradient(45deg, #ff9800, #ffb74d);
+            color: white;
+        }
+        .action-btn-danger:hover {
+            background: linear-gradient(45deg, #e68900, #ff9800);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Styling Catatan/Textarea */
+        #catatan-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+            resize: vertical;
+            font-family: sans-serif;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        #catatan-input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        .catatan-section h4 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        /* --- AKHIR STYLING BARU --- */
+
+
         /* CSS MODAL (Perbaikan Z-Index) */
         .modal-overlay {
             position: fixed;
@@ -124,6 +219,7 @@
             background-color: #e3f2fd;
             cursor: pointer;
             transition: background-color 0.2s;
+            font-weight: bold; /* Diperbarui */
         }
         .modal-step-btn:hover { background-color: #bbdefb; }
         .surah-text-display {
@@ -154,8 +250,12 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .review-controls-footer {
+             display:flex; justify-content:space-between; margin-top:20px;
+        }
 
-        /* DARK MODE STYLES */
+
+        /* DARK MODE STYLES (Diperbarui agar cocok dengan tombol baru) */
         body.dark-mode { background-color: #121212; color: #e0e0e0; }
         body.dark-mode .app-container { background-color: #1e1e1e; border-color: #66bb6a; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
         body.dark-mode .header-container { border-bottom-color: #333; }
@@ -172,8 +272,12 @@
         body.dark-mode .modal-step-btn:hover { background-color: #555; }
         body.dark-mode .surah-text-display { background-color: #1e1e1e; color: #e0e0e0; border: 1px solid #444; }
         body.dark-mode .existing-progress-view { border-top-color: #444; }
-        body.dark-mode textarea { background-color: #333; color: #e0e0e0; border: 1px solid #555; }
-        body.dark-mode .back-button, body.dark-mode .save-button, body.dark-mode .delete-button { background-color: #555; color: #e0e0e0; }
+        body.dark-mode #catatan-input { background-color: #333; color: #e0e0e0; border: 1px solid #555; }
+        /* Tombol di Dark Mode */
+        body.dark-mode .action-btn-secondary { background-color: #424242; color: #e0e0e0; border: 1px solid #555; }
+        body.dark-mode .action-btn-secondary:hover { background-color: #555; }
+        body.dark-mode .delete-all-button { background-color: #d32f2f; }
+        body.dark-mode .delete-all-button:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body class="light-mode">
@@ -196,7 +300,7 @@
         <div id="calendar-root"></div>
         
         <div class="app-controls">
-            <button class="delete-all-button" onclick="deleteAllData()">Hapus SELURUH Data</button>
+            <button class="delete-all-button" onclick="deleteAllData()">🗑️ Hapus SELURUH Data</button>
         </div>
 
         <div class="bottom-controls">
@@ -295,11 +399,11 @@
                 isLoading = true; renderModal();
                 const response = await fetch(API_URL);
                 if (!response.ok) {
-           throw new Error(`Gagal mengambil data dari API (Status: ${response.status}).`);
+                    throw new Error(`Gagal mengambil data dari API (Status: ${response.status}).`);
                 }
                 const data = await response.json();
                 
-                let surahText = `بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\n\n`;
+                let surahText = `بِسْمِ ٱللَّهِ ٱٱرَّحْمَٰنِ ٱرَّحِيمِ\n\n`;
                 
                 if (data.data && data.data.ayahs) {
                     data.data.ayahs.forEach(ayah => {
@@ -557,7 +661,8 @@
                      surahListHTML += `</div>`;
                 }
                 
-                contentHTML = `<h3>Pilih Surah di ${modalSelection.juz.name}</h3><button class="back-button" onclick="setStep('JUZ')">Pilih Juz Lain</button>${surahListHTML}`;
+                // TEKS DIPERBAIKI: Pilih Juz Lain
+                contentHTML = `<h3>Pilih Surah di ${modalSelection.juz.name}</h3><button class="action-btn-secondary" onclick="setStep('JUZ')">↩️ Pilih Juz Lain</button>${surahListHTML}`;
             } 
             else if (modalStep === 'REVIEW') {
                 const surahText = modalSelection.surah.text || "Gagal memuat teks Al-Qur'an.";
@@ -565,8 +670,9 @@
                     <h3>Catatan Muroja'ah: ${modalSelection.surah.name}</h3>
                     <p>Konten di bawah diambil langsung dari API Al-Qur'an:</p>
                     <div class="surah-text-display"><pre>${surahText}</pre></div><hr/>
-                    <div class="catatan-section"><h4>Catatan Anda:</h4>
-                        <textarea id="catatan-input" placeholder="Tulis catatan di sini" rows="5">${modalSelection.catatan}</textarea>
+                    <div class="catatan-section">
+                        <h4>📝 Catatan Anda:</h4>
+                        <textarea id="catatan-input" placeholder="Tulis catatan Muroja'ah Anda di sini..." rows="5">${modalSelection.catatan}</textarea>
                     </div>
                 `;
             }
@@ -579,14 +685,16 @@
                 existingProgressHTML = `<div class="existing-progress-view"><h4>Progress di ${selectedDate} sebelumnya:</h4>${items}</div>`;
             }
 
+            // TEKS DIPERBAIKI: Hapus Data di Tanggal Ini
             const deleteButtonPerDateHTML = currentData.length > 0 && modalStep !== 'REVIEW' ? 
-                `<button class="delete-button" onclick="deleteProgress()">Hapus Data di Tanggal Ini</button>` : '';
+                `<button class="action-btn-danger" onclick="deleteProgress()">🗑️ Hapus Data di Tanggal Ini</button>` : '';
 
             let footerContentHTML = '';
             if (modalStep === 'REVIEW') {
-                footerContentHTML = `<div class="review-controls-footer" style="display:flex; justify-content:space-between; margin-top:20px;">
-                    <button class="back-button" onclick="setStep('SURAH')">Pilih Surah Lain</button>
-                    <button class="save-button" data-action="save-progress">Simpan Catatan</button>
+                // TEKS DIPERBAIKI: Pilih Surah Lain & Simpan Catatan
+                footerContentHTML = `<div class="review-controls-footer">
+                    <button class="action-btn-secondary" onclick="setStep('SURAH')">↩️ Pilih Surah Lain</button>
+                    <button class="action-btn-primary" data-action="save-progress">💾 Simpan Catatan</button>
                 </div>`;
             }
             
@@ -715,7 +823,14 @@
             selectedDate = date;
             isDataModalOpen = true; // Buka modal data
             modalStep = 'JUZ';
-            modalSelection = { juz: null, surah: null, catatan: '' };
+            // Pastikan catatan dimuat dari data yang sudah ada jika ada, atau kosongkan
+            const existingProgress = progressData[selectedDate] || [];
+            modalSelection = { 
+                juz: null, 
+                surah: null, 
+                // Jika sudah ada data, ambil catatan terakhir (atau default kosong)
+                catatan: existingProgress.length > 0 ? existingProgress[existingProgress.length - 1].catatan : '' 
+            };
             renderApp(); // Render ulang untuk menampilkan modal data
         }
 
@@ -726,7 +841,7 @@
             }
             renderModal();
         }
-
+        
         function saveProgress() {
             const catatanInput = document.getElementById('catatan-input');
             const catatan = catatanInput ? catatanInput.value : '';
@@ -740,6 +855,7 @@
                     timestamp: new Date().toISOString()
                 };
 
+                // Catatan akan ditambahkan ke data yang sudah ada di tanggal tersebut
                 const currentData = progressData[selectedDate] ? [...progressData[selectedDate], newData] : [newData];
                 progressData = { ...progressData, [selectedDate]: currentData };
                 saveProgressData(progressData);
