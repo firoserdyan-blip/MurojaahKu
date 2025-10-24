@@ -279,7 +279,18 @@
         body.dark-mode .delete-all-button { background-color: #d32f2f; }
         body.dark-mode .delete-all-button:hover { background-color: #b71c1c; }
     </style>
-</head>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-880X3QZ5R9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      // KODE STANDAR GA4 SUDAH CUKUP KARENA location.pathname 
+      // akan otomatis mengirim /MurojaahKu/ sebagai path di GitHub Pages
+      gtag('config', 'G-880X3QZ5R9');
+    </script>
+    </head>
 <body class="light-mode">
     <div class="app-container">
         <div class="header-container">
